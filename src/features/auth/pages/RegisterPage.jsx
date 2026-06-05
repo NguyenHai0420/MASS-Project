@@ -46,6 +46,7 @@ const Register = () => {
                         type="text"
                         placeholder="Full Name"
                         onChange={(e) => setName(e.target.value)}
+                        required
                     />
                 </Form.Group>
 
@@ -55,6 +56,7 @@ const Register = () => {
                         type="email"
                         placeholder="Email Address"
                         onChange={(e) => setEmail(e.target.value)}
+                        required
                     />
                 </Form.Group>
 
