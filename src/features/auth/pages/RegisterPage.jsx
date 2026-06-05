@@ -32,6 +32,7 @@ const Register = () => {
     };
 
     return (
+        <div className="d-flex justify-content-center align-items-center vh-100 bg-light">  
         <Card className="p-4 shadow-sm border rounded-4" style={{ width: "500px" }}>
             <h1 className="text-center">Create Account</h1>
             <h4 className="text-center text-muted fs-6 pb-3">
@@ -80,6 +81,7 @@ const Register = () => {
                 </div>
             </Form>
         </Card>
+        </div>
     );
 };
 
