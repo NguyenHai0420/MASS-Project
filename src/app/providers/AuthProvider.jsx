@@ -1,42 +1,54 @@
 import { createContext, useEffect, useState } from "react";
+import authService from "../../features/auth/services/auth.service";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Logic for authentication (e.g., login, logout, check auth status)
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user data exists in localStorage on component mount
+    let active = true;
 
-    function checkAuthStatus() {
-      const userData = localStorage.getItem("user");
-
-      // Reset to context
-      if (userData) {
-        setUser(JSON.parse(userData)); // Set user state from localStorage
+    (async () => {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (active) {
+          setUser(storedUser ? JSON.parse(storedUser) : null);
+        }
+      } catch {
+        if (active) {
+          setUser(null);
+          localStorage.removeItem("user");
+        }
+      } finally {
+        if (active) setLoading(false);
       }
-    }
+    })();
 
-    checkAuthStatus();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const login = (response) => {
-    setUser(response);
-    localStorage.setItem("user", JSON.stringify(response)); // Store user data in localStorage
+  const login = (userProfile) => {
+    setUser(userProfile);
+    localStorage.setItem("user", JSON.stringify(userProfile));
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user"); // Clear user data from localStorage
-  }; 
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setUser(null);
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+  };
 
-  const dataContext = { user };
-  const actionContext = { login, logout };
-  
-  return (
-    <AuthContext.Provider value={{ ...dataContext, ...actionContext }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = { user, loading, login, logout };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
