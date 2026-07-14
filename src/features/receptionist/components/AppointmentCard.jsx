@@ -40,7 +40,7 @@ const AppointmentCard = ({ appointment }) => {
           <span><strong>Chuyên Khoa: </strong>{appointment.specialty}</span>
           <span><strong>Tên: </strong>{appointment.doctorName}</span>
           <span><strong>Lịch Khám: </strong>{appointment.appointmentDate}</span>
-          <span><strong>Thời Gian Cụ Thể: </strong>{appointment.appointmentTime}</span>
+          <span><strong>Thờxi Gian Cụ Thể: </strong>{appointment.appointmentTime}</span>
         </div>
 
         <p className="text-secondary small appointment-note flex-grow-1">Yêu cầu khám bệnh: {appointment.note}</p>
