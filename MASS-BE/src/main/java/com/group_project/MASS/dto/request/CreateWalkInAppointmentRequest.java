@@ -29,7 +29,7 @@ public class CreateWalkInAppointmentRequest {
     @FutureOrPresent(message = "Ngày khám không được nhỏ hơn ngày hiện tại")
     private LocalDate appointmentDate;
 
-    private LocalTime createdTime;
+    private LocalTime searchFromTime;
 
     @NotBlank(message = "Lý do khám không được để trống")
     private String reason;
