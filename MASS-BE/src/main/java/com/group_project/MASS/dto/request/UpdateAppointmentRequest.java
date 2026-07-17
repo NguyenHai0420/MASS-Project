@@ -13,11 +13,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateAppointmentRequest {
-    @NotNull(message = "Schedule ID không được để trống")
     private Long scheduleId;
 
     @Size(max = 1000, message = "Lý do khám không được vượt quá 1000 ký tự")
     private String reason;
 
-    private AppointmentStatus appointmentStatus;
+    //private AppointmentStatus appointmentStatus;
 }

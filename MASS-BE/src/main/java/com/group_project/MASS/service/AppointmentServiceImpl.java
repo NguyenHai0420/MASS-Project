@@ -36,7 +36,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 
     // Appointment List
-    // /api/receptionist/appointments
     @Override
     @Transactional(readOnly = true)
     public List<AppointmentListResponse> getAppointments(LocalDate date,
@@ -93,17 +92,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         );
     }
 
-    private AppointmentListResponse mapToListResponse(Appointment appointment) {
-        Payment payment = paymentRepository
-                .findByAppointmentId(appointment.getId())
-                .orElse(null);
-
-        return AppointmentMapper.toListResponse(
-                appointment,
-                payment
-        );
-    }
-
+    // Tạo lịch hẹn khám tại phòng khám
     @Override
     public AppointmentDetailResponse createWalkInAppointment(
             CreateWalkInAppointmentRequest request
@@ -142,9 +131,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         Schedule selectedSchedule;
 
-        /*
-         * Trường hợp lễ tân đã chọn cụ thể bác sĩ.
-         */
+        // Trường hợp lễ tân đã chọn cụ thể bác sĩ.
         if (request.getDoctorProfileId() != null) {
             DoctorProfile doctorProfile = doctorProfileRepository
                             .findById(request.getDoctorProfileId())
@@ -204,18 +191,14 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .patient(patient)
                 .doctorProfile(selectedSchedule.getDoctorProfile())
                 .schedule(selectedSchedule)
-                /*
-                 * Walk-in vừa được tạo, mặc định chờ xử lý hoặc thanh toán.
-                 */
+                // Walk-in vừa được tạo, mặc định chờ xử lý hoặc thanh toán.
                 .status(AppointmentStatus.PENDING_PAYMENT)
                 .reason(request.getReason().trim())
                 .queueNumber(queueNumber)
                 .type(AppointmentType.WALK_IN)
                 .build();
 
-        /*
-         * Đánh dấu schedule không còn trống.
-         */
+        // Đánh dấu schedule không còn trống.
         selectedSchedule.setAvailable(false);
         scheduleRepository.save(selectedSchedule);
 
@@ -232,33 +215,182 @@ public class AppointmentServiceImpl implements AppointmentService {
         );
     }
 
+    // Cập nhật lịch hẹn khám
     @Override
     public AppointmentDetailResponse updateAppointment(
             Long appointmentId,
             UpdateAppointmentRequest request
     ) {
-        throw new UnsupportedOperationException(
-                "Chức năng cập nhật lịch chưa được triển khai"
+        if (request == null) {
+            throw new IllegalArgumentException(
+                    "Dữ liệu cập nhật không được để trống"
+            );
+        }
+
+        Appointment appointment = appointmentRepository
+                .findById(appointmentId).orElseThrow(() ->  new IllegalArgumentException("Không tìm thấy lịch khám với ID: " + appointmentId));
+
+        validateAppointmentCanBeModified(appointment);
+
+        boolean hasScheduleChange = request.getScheduleId() != null
+                && !request.getScheduleId()
+                .equals(appointment.getSchedule().getId());
+
+        boolean hasReasonChange = request.getReason() != null;
+
+        if (!hasScheduleChange && !hasReasonChange) {
+            throw new IllegalArgumentException(
+                    "Không có thông tin nào được thay đổi"
+            );
+        }
+
+        if (hasScheduleChange) {
+            changeAppointmentSchedule(
+                    appointment,
+                    request.getScheduleId()
+            );
+        }
+
+        if (hasReasonChange) {
+            String newReason = request.getReason().trim();
+
+            if (newReason.isBlank()) {
+                throw new IllegalArgumentException(
+                        "Lý do khám không được để trống"
+                );
+            }
+
+            appointment.setReason(newReason);
+        }
+
+        Appointment savedAppointment =
+                appointmentRepository.save(appointment);
+
+        Payment payment = paymentRepository
+                .findByAppointmentId(savedAppointment.getId())
+                .orElse(null);
+
+        return AppointmentMapper.toDetailResponse(
+                savedAppointment,
+                payment
         );
     }
 
+    // Cập nhật trạng thái lịch hẹn khám
     @Override
     public ApiMessageResponse updateAppointmentStatus(
             Long appointmentId,
             UpdateAppointmentStatusRequest request
     ) {
-        throw new UnsupportedOperationException(
-                "Chức năng cập nhật trạng thái chưa được triển khai"
+        if (request == null || request.getAppointmentStatus() == null) {
+            throw new IllegalArgumentException(
+                    "Trạng thái appointment không được để trống"
+            );
+        }
+
+        Appointment appointment = appointmentRepository
+                .findById(appointmentId).orElseThrow(() ->  new IllegalArgumentException("Không tìm thấy lịch khám với ID: " + appointmentId));
+
+        AppointmentStatus currentStatus =
+                appointment.getStatus();
+
+        AppointmentStatus newStatus =
+                request.getAppointmentStatus();
+
+        if (currentStatus == newStatus) {
+            return new ApiMessageResponse(
+                    "Appointment đã ở trạng thái " + newStatus
+            );
+        }
+
+        if (newStatus == AppointmentStatus.CANCELLED) {
+            throw new IllegalArgumentException(
+                    "Vui lòng sử dụng chức năng hủy lịch "
+                            + "để chuyển sang trạng thái CANCELLED"
+            );
+        }
+
+        validateStatusTransition(
+                currentStatus,
+                newStatus
+        );
+
+        appointment.setStatus(newStatus);
+
+        /*
+         * COMPLETED và NO_SHOW kết thúc lượt khám.
+         * Slot không nên được mở lại vì thời gian đó đã được sử dụng.
+         */
+        appointmentRepository.save(appointment);
+
+        return new ApiMessageResponse(
+                "Cập nhật trạng thái appointment thành công: "
+                        + newStatus
         );
     }
 
+    // Hủy lịch hẹn khám
     @Override
     public ApiMessageResponse cancelAppointment(
             Long appointmentId,
             CancelAppointmentRequest request
     ) {
-        throw new UnsupportedOperationException(
-                "Chức năng hủy lịch chưa được triển khai"
+        if (request == null
+                || request.getCancelReason() == null
+                || request.getCancelReason().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Lý do hủy lịch không được để trống"
+            );
+        }
+
+        Appointment appointment = appointmentRepository
+                .findById(appointmentId).orElseThrow(() ->  new IllegalArgumentException("Không tìm thấy lịch khám với ID: " + appointmentId));
+
+        if (appointment.getStatus()
+                == AppointmentStatus.CANCELLED) {
+            throw new IllegalStateException(
+                    "Appointment đã được hủy trước đó"
+            );
+        }
+
+        if (appointment.getStatus()
+                == AppointmentStatus.COMPLETED) {
+            throw new IllegalStateException(
+                    "Không thể hủy lịch đã hoàn thành"
+            );
+        }
+
+        if (appointment.getStatus()
+                == AppointmentStatus.NO_SHOW) {
+            throw new IllegalStateException(
+                    "Không thể hủy lịch đã được đánh dấu không đến"
+            );
+        }
+
+        Schedule schedule = appointment.getSchedule();
+
+        /*
+         * Chỉ mở lại slot nếu thời gian khám chưa xảy ra.
+         */
+        if (isScheduleInFuture(schedule)) {
+            schedule.setAvailable(true);
+            scheduleRepository.save(schedule);
+        }
+
+        appointment.setStatus(
+                AppointmentStatus.CANCELLED
+        );
+
+        appointmentRepository.save(appointment);
+
+        /*
+         * Entity hiện tại chưa có cancellationReason,
+         * nên lý do hủy chưa được lưu vào bảng appointments.
+         * Phần Notification sau sẽ đưa lý do vào nội dung thông báo.
+         */
+        return new ApiMessageResponse(
+                "Hủy lịch khám thành công. Lý do: "
+                        + request.getCancelReason().trim()
         );
     }
 
@@ -358,7 +490,24 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .toList();
     }
 
+    /*
+     * HELPER
+     */
 
+    private AppointmentListResponse mapToListResponse(Appointment appointment) {
+        Payment payment = paymentRepository
+                .findByAppointmentId(appointment.getId())
+                .orElse(null);
+
+        return AppointmentMapper.toListResponse(
+                appointment,
+                payment
+        );
+    }
+
+    /*
+     * Kiểm tra yêu cầu tạo mới
+     */
     private void validateWalkInRequest(
             CreateWalkInAppointmentRequest request
     ) {
@@ -395,6 +544,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
     }
 
+    /*
+     * Tìm thời gian gần nhất theo bác sĩ
+     */
     private Schedule findNearestAvailableScheduleByDoctor(
             Long doctorProfileId,
             LocalDate date,
@@ -422,6 +574,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 ));
     }
 
+    /*
+     * Tìm slot gần nhất theo chuyên khoa
+     */
     private Schedule findNearestAvailableScheduleBySpecialty(
             Long specialtyId,
             LocalDate date,
@@ -455,6 +610,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 ));
     }
 
+    /*
+     * Xác định thời gian bắt đầu tìm slot
+     */
     private LocalTime determineSearchFromTime(
             LocalDate appointmentDate,
             LocalTime requestedTime
@@ -476,9 +634,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                     : requestedTime;
         }
 
-        /*
-         * Ngày hôm nay: không được tìm slot trong quá khứ.
-         */
+        // Ngày hôm nay: không được tìm slot trong quá khứ.
         LocalTime currentTime = LocalTime.now();
 
         LocalTime result = requestedTime != null
@@ -496,6 +652,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         return result;
     }
 
+    /*
+     * Tính số thứ tự cố định theo giờ
+     */
     private int calculateQueueNumber(
             LocalTime slotStartTime
     ) {
@@ -534,4 +693,199 @@ public class AppointmentServiceImpl implements AppointmentService {
         return (int) (minutesFromOpening / slotDurationMinutes) + 1;
     }
 
+    /*
+     * Helper thay đổi lịch hẹn khám
+     */
+    private void changeAppointmentSchedule(
+            Appointment appointment,
+            Long newScheduleId
+    ) {
+        Schedule oldSchedule = appointment.getSchedule();
+
+        Schedule newSchedule = scheduleRepository
+                .findById(newScheduleId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Không tìm thấy schedule có ID: "
+                                + newScheduleId
+                ));
+
+        validateNewSchedule(
+                appointment,
+                newSchedule
+        );
+
+        // Giải phóng slot cũ.
+        oldSchedule.setAvailable(true);
+
+        // Khóa slot mới.
+        newSchedule.setAvailable(false);
+
+        scheduleRepository.save(oldSchedule);
+        scheduleRepository.save(newSchedule);
+
+        /*
+         * Schedule chứa bác sĩ nên khi đổi schedule
+         * cần cập nhật luôn doctorProfile.
+         */
+        appointment.setSchedule(newSchedule);
+        appointment.setDoctorProfile(
+                newSchedule.getDoctorProfile()
+        );
+
+        appointment.setQueueNumber(
+                calculateQueueNumber(
+                        newSchedule.getStartTime()
+                )
+        );
+    }
+
+    /*
+     * Helper kiểm tra lịch hẹn khám mới
+     */
+    private void validateNewSchedule(
+            Appointment appointment,
+            Schedule newSchedule
+    ) {
+        if (!newSchedule.isAvailable()) {
+            throw new IllegalStateException(
+                    "Slot được chọn hiện không còn trống"
+            );
+        }
+
+        boolean occupied = appointmentRepository
+                .existsByScheduleIdAndStatusNot(
+                        newSchedule.getId(),
+                        AppointmentStatus.CANCELLED
+                );
+
+        if (occupied) {
+            throw new IllegalStateException(
+                    "Slot được chọn đã có lịch khám"
+            );
+        }
+
+        if (newSchedule.getDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException(
+                    "Không thể chuyển lịch sang ngày trong quá khứ"
+            );
+        }
+
+        if (newSchedule.getDate().isEqual(LocalDate.now())
+                && newSchedule.getStartTime()
+                .isBefore(LocalTime.now())) {
+            throw new IllegalArgumentException(
+                    "Không thể chuyển lịch sang giờ đã qua"
+            );
+        }
+
+        /*
+         * Không cho đổi sang chuyên khoa khác.
+         *
+         * Nếu khách muốn khám chuyên khoa khác,
+         * nên hủy lịch cũ và tạo lịch mới.
+         */
+        Long oldSpecialtyId = appointment
+                .getDoctorProfile()
+                .getSpecialty()
+                .getId();
+
+        Long newSpecialtyId = newSchedule
+                .getDoctorProfile()
+                .getSpecialty()
+                .getId();
+
+        if (!oldSpecialtyId.equals(newSpecialtyId)) {
+            throw new IllegalArgumentException(
+                    "Schedule mới phải thuộc cùng chuyên khoa "
+                            + "với lịch khám hiện tại"
+            );
+        }
+    }
+
+    /*
+     * Helper kiểm tra lịch hẹn khám có thể sửa
+     */
+    private void validateAppointmentCanBeModified(
+            Appointment appointment
+    ) {
+        if (appointment.getStatus()
+                == AppointmentStatus.CANCELLED) {
+            throw new IllegalStateException(
+                    "Không thể cập nhật lịch đã bị hủy"
+            );
+        }
+
+        if (appointment.getStatus()
+                == AppointmentStatus.COMPLETED) {
+            throw new IllegalStateException(
+                    "Không thể cập nhật lịch đã hoàn thành"
+            );
+        }
+
+        if (appointment.getStatus()
+                == AppointmentStatus.NO_SHOW) {
+            throw new IllegalStateException(
+                    "Không thể cập nhật lịch đã được đánh dấu không đến"
+            );
+        }
+    }
+
+    /*
+     * Helper kiểm tra cập nhật trạng thái lịch khám
+     */
+    private void validateStatusTransition(
+            AppointmentStatus currentStatus,
+            AppointmentStatus newStatus
+    ) {
+        if (currentStatus == AppointmentStatus.CANCELLED) {
+            throw new IllegalStateException(
+                    "Lịch đã hủy không thể thay đổi trạng thái"
+            );
+        }
+
+        if (currentStatus == AppointmentStatus.COMPLETED) {
+            throw new IllegalStateException(
+                    "Lịch đã hoàn thành không thể thay đổi trạng thái"
+            );
+        }
+
+        if (currentStatus == AppointmentStatus.NO_SHOW) {
+            throw new IllegalStateException(
+                    "Lịch đã được đánh dấu không đến"
+            );
+        }
+
+        if (currentStatus == AppointmentStatus.PENDING_PAYMENT
+                && newStatus != AppointmentStatus.WAITING_CHECK_IN
+                && newStatus != AppointmentStatus.NO_SHOW) {
+            throw new IllegalArgumentException(
+                    "Lịch PENDING chỉ có thể chuyển thành "
+                            + "CONFIRMED hoặc NO_SHOW"
+            );
+        }
+
+        if (currentStatus == AppointmentStatus.WAITING_CHECK_IN
+                && newStatus != AppointmentStatus.COMPLETED
+                && newStatus != AppointmentStatus.NO_SHOW) {
+            throw new IllegalArgumentException(
+                    "Lịch CONFIRMED chỉ có thể chuyển thành "
+                            + "COMPLETED hoặc NO_SHOW"
+            );
+        }
+    }
+
+    /*
+     * Helper kiểm tra lịch trong tương lai
+     */
+    private boolean isScheduleInFuture(
+            Schedule schedule
+    ) {
+        if (schedule.getDate().isAfter(LocalDate.now())) {
+            return true;
+        }
+
+        return schedule.getDate().isEqual(LocalDate.now())
+                && schedule.getStartTime()
+                .isAfter(LocalTime.now());
+    }
 }
