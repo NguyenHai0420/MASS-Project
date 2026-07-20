@@ -1,0 +1,174 @@
+import { useState, useEffect } from "react";
+import { Container, Table, Button, Badge, Modal, Form } from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import toast, { Toaster } from "react-hot-toast";
+import DashboardLayout from "../../../shared/components/DashboardLayout";
+import adminService from "../services/adminService";
+
+// ========================
+// UC-M10 — Manage User Accounts
+// Admin quản lý tài khoản người dùng
+// ========================
+
+// Hàm trả về màu badge theo role
+function getRoleBadge(role) {
+    if (role === "ADMIN" || role === "ROLE_ADMIN") return "danger";
+    if (role === "DOCTOR" || role === "ROLE_DOCTOR") return "primary";
+    return "success"; // PATIENT
+}
+
+export default function ManageUsersPage() {
+    const [users, setUsers] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [editItem, setEditItem] = useState(null);
+
+    const { register, handleSubmit, formState: { errors }, reset } = useForm();
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const data = await adminService.getAllUsers();
+            setUsers(data);
+        } catch (error) {
+            toast.error("Không thể tải danh sách người dùng!");
+        }
+    };
+
+    const handleShowEdit = (item) => {
+        setEditItem(item);
+        reset(item);
+        setShowModal(true);
+    };
+
+    const handleClose = () => {
+        setShowModal(false);
+        setEditItem(null);
+        reset();
+    };
+
+    const onSubmit = async (data) => {
+        try {
+            await adminService.updateUser(editItem.id, data);
+            toast.success("Cập nhật người dùng thành công!");
+            handleClose();
+            fetchData();
+        } catch (error) {
+            toast.error("Có lỗi xảy ra!");
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm("Bạn có chắc muốn xoá tài khoản này?")) return;
+        try {
+            await adminService.deleteUser(id);
+            toast.success("Xoá tài khoản thành công!");
+            fetchData();
+        } catch (error) {
+            toast.error("Xoá thất bại!");
+        }
+    };
+
+    return (
+        <DashboardLayout>
+            <Container fluid>
+                <Toaster />
+                <h4 className="mb-3">👥 Quản lý Người dùng</h4>
+
+                <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Họ tên</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                            <th>Role</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {users.map((item, index) => (
+                            <tr key={item.id}>
+                                <td>{index + 1}</td>
+                                <td>{item.fullName}</td>
+                                <td>{item.email}</td>
+                                <td>{item.phone}</td>
+                                <td>
+                                    <Badge bg={getRoleBadge(item.role)}>
+                                        {item.role}
+                                    </Badge>
+                                </td>
+                                <td>
+                                    <Button
+                                        variant="warning"
+                                        size="sm"
+                                        className="me-2"
+                                        onClick={() => handleShowEdit(item)}
+                                    >
+                                        Sửa
+                                    </Button>
+                                    <Button
+                                        variant="danger"
+                                        size="sm"
+                                        onClick={() => handleDelete(item.id)}
+                                    >
+                                        Xoá
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
+
+                {/* Modal Sửa */}
+                <Modal show={showModal} onHide={handleClose} backdrop="static">
+                    <Modal.Header closeButton>
+                        <Modal.Title>Sửa thông tin người dùng</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Họ tên</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    {...register("fullName", { required: true })}
+                                />
+                                {errors.fullName && (
+                                    <p className="text-danger">Họ tên không được để trống</p>
+                                )}
+                            </Form.Group>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label>Số điện thoại</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    {...register("phone")}
+                                />
+                            </Form.Group>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label>Role</Form.Label>
+                                <Form.Select {...register("role")}>
+                                    <option value="ROLE_PATIENT">PATIENT</option>
+                                    <option value="ROLE_DOCTOR">DOCTOR</option>
+                                    <option value="ROLE_ADMIN">ADMIN</option>
+                                </Form.Select>
+                            </Form.Group>
+
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={handleClose}>
+                                    Đóng
+                                </Button>
+                                <Button variant="primary" type="submit">
+                                    Lưu
+                                </Button>
+                            </Modal.Footer>
+                        </form>
+                    </Modal.Body>
+                </Modal>
+            </Container>
+        </DashboardLayout>
+    );
+}
