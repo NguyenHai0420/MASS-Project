@@ -55,6 +55,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers("/api/v1/auths/**").permitAll()
+                    .requestMatchers("/api/specialties/**", "/api/doctors/**", "/api/schedules/**").permitAll()
+                    .requestMatchers("/api/appointments/**").permitAll() // Tạm thời cho phép appointments để test (tùy thuộc vào việc frontend đã gắn token chưa)
                     .anyRequest().authenticated()
             );
 
