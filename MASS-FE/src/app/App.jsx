@@ -24,25 +24,26 @@ function App() {
           <Navbar />
           <main className="flex-grow-1">
             <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/book-appointment" element={<BookAppointment />} />
-          <Route path="/doctors" element={<DoctorList />} />
-          <Route path="/doctors/:id" element={<DoctorDetail />} />
-          <Route path="/my-appointments" element={<MyAppointments />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/verify-otp" element={<VerifyOtp />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+              {/* Public routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/book-appointment" element={<BookAppointment />} />
+              <Route path="/bookAppointment" element={<BookAppointment />} />
+              <Route path="/doctors" element={<DoctorList />} />
+              <Route path="/doctors/:id" element={<DoctorDetail />} />
+              <Route path="/my-appointments" element={<MyAppointments />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/verify-otp" element={<VerifyOtp />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Protected routes example */}
-          <Route element={<PrivateRoute allowedRoles={["ROLE_PATIENT", "ROLE_DOCTOR", "ROLE_RECEPTIONIST", "ROLE_ADMIN"]} />}>
-            <Route path="/dashboard" element={<div>Welcome to Dashboard</div>} />
-            <Route path="/profile" element={<Profile />} />
-          </Route>
-          
-          <Route path="*" element={<Navigate to="/" replace />} />
+              {/* Protected routes */}
+              <Route element={<PrivateRoute allowedRoles={["ROLE_PATIENT", "ROLE_DOCTOR", "ROLE_RECEPTIONIST", "ROLE_ADMIN"]} />}>
+                <Route path="/dashboard" element={<div>Welcome to Dashboard</div>} />
+                <Route path="/profile" element={<Profile />} />
+              </Route>
+              
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
           <Footer />
