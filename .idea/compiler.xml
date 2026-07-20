@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+<<<<<<< HEAD
       <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -24,6 +25,22 @@
       <module name="SE1947-JV_SBA301_Phongnthe181783_Lab04" options="-parameters" />
       <module name="SE1947-JV_SBA301_Phongnthe181783_Lab06" options="-parameters" />
       <module name="SE1947_SBA_Phongnthe181783_Lab3" options="-parameters" />
+=======
+      <profile name="Annotation profile for MASS" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+        </processorPath>
+        <module name="MASS" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="MASS" options="-parameters" />
+>>>>>>> origin/haint
     </option>
   </component>
 </project>

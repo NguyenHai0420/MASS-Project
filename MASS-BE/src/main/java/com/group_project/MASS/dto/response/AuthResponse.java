@@ -1,4 +1,4 @@
-package com.group_project.MASS.dto;
+package com.group_project.MASS.dto.response;
 
 import com.group_project.MASS.model.Role;
 import lombok.AllArgsConstructor;

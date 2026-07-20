@@ -1,10 +1,9 @@
 package com.group_project.MASS.controller;
 
-import com.group_project.MASS.dto.LoginRequest;
-import com.group_project.MASS.dto.RegisterRequest;
+import com.group_project.MASS.dto.request.LoginRequest;
+import com.group_project.MASS.dto.request.RegisterRequest;
 import com.group_project.MASS.service.AuthService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

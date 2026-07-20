@@ -1,8 +1,8 @@
 package com.group_project.MASS.service;
 
-import com.group_project.MASS.dto.AuthResponse;
-import com.group_project.MASS.dto.LoginRequest;
-import com.group_project.MASS.dto.RegisterRequest;
+import com.group_project.MASS.dto.response.AuthResponse;
+import com.group_project.MASS.dto.request.LoginRequest;
+import com.group_project.MASS.dto.request.RegisterRequest;
 import com.group_project.MASS.model.PasswordResetToken;
 import com.group_project.MASS.model.Role;
 import com.group_project.MASS.model.User;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
