@@ -1,6 +1,7 @@
 package com.group_project.MASS.repository;
 
 import com.group_project.MASS.model.Appointment;
+<<<<<<< HEAD
 import com.group_project.MASS.model.AppointmentStatus;
 import com.group_project.MASS.model.AppointmentType;
 import com.group_project.MASS.model.DoctorProfile;
@@ -9,10 +10,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+=======
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+>>>>>>> origin/uyenht
 import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+<<<<<<< HEAD
 
     // Lấy tất cả appointment của một doctor
     List<Appointment> findByDoctorProfileOrderByCreatedAtDesc(DoctorProfile doctorProfile);
@@ -51,4 +58,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     // Check if an appointment exists for a specific schedule and status not equal to the given status
     boolean existsByScheduleIdAndStatusNot(Long scheduleId, AppointmentStatus status);
+=======
+    List<Appointment> findByPatientIdOrderByCreatedAtDesc(Long patientId);
+>>>>>>> origin/uyenht
 }

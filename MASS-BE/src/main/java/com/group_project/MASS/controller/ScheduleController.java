@@ -1,48 +1,27 @@
 package com.group_project.MASS.controller;
 
-import com.group_project.MASS.dto.ScheduleRequest;
-import com.group_project.MASS.dto.ScheduleResponse;
+import com.group_project.MASS.dto.ScheduleDto;
 import com.group_project.MASS.service.ScheduleService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/doctor/schedules")
-@PreAuthorize("hasAuthority('ROLE_DOCTOR')")
+@RequestMapping("/api/schedules")
 public class ScheduleController {
 
     @Autowired
     private ScheduleService scheduleService;
 
-    // GET /api/doctor/schedules — Lấy schedules của bản thân
     @GetMapping
-    public ResponseEntity<List<ScheduleResponse>> getMySchedules(Authentication authentication) {
-        String email = authentication.getName();  // lấy email từ JWT
-        return ResponseEntity.ok(scheduleService.getMySchedules(email));
-    }
-
-    // POST /api/doctor/schedules — Tạo schedule mới
-    @PostMapping
-    public ResponseEntity<ScheduleResponse> createSchedule(
-            @Valid @RequestBody ScheduleRequest request,
-            Authentication authentication) {
-        String email = authentication.getName();
-        return ResponseEntity.ok(scheduleService.createSchedule(email, request));
-    }
-
-    // DELETE /api/doctor/schedules/{id} — Xóa schedule
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSchedule(
-            @PathVariable Long id,
-            Authentication authentication) {
-        String email = authentication.getName();
-        scheduleService.deleteSchedule(id, email);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<List<ScheduleDto>> getSchedules(
+            @RequestParam Long doctorId,
+            @RequestParam String date) {
+        return ResponseEntity.ok(scheduleService.getDoctorSchedules(doctorId, date));
     }
 }

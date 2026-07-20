@@ -16,7 +16,11 @@ const Login = () => {
     try {
       const response = await authService.login({ email, password });
       login(response.data);
-      navigate("/dashboard");
+      if(response.data.role === "ROLE_ADMIN") {
+        navigate("/dashboard");
+      } else {
+        navigate("/profile");
+      }
     } catch (error) {
       setError("Invalid email or password.");
     }

@@ -4,6 +4,7 @@ import com.group_project.MASS.model.Specialty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+<<<<<<< HEAD
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +20,8 @@ public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
 
     // Check if a specialty exists by name, ignoring case
     boolean existsByNameIgnoreCase(String name);
+=======
+@Repository
+public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
+>>>>>>> origin/uyenht
 }

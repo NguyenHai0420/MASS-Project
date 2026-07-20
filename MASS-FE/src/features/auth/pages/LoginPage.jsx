@@ -25,7 +25,7 @@ const Login = () => {
 
             alert(`Welcome, ${response.name}!`);
 
-            navigate("/dashboard");
+            navigate("/home");
         } catch (error) {
             alert("Invalid email or password!");
             console.error(error);

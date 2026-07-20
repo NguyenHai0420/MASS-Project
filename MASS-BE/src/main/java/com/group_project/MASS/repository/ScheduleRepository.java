@@ -1,11 +1,15 @@
 package com.group_project.MASS.repository;
 
+<<<<<<< HEAD
 import com.group_project.MASS.model.DoctorProfile;
+=======
+>>>>>>> origin/uyenht
 import com.group_project.MASS.model.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+<<<<<<< HEAD
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -55,4 +59,12 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     // Lấy schedule theo ID và trạng thái còn trống.
     Optional<Schedule> findByIdAndIsAvailableTrue(Long id);
+=======
+import java.util.List;
+
+@Repository
+public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
+    List<Schedule> findByDoctorProfileIdAndDate(Long doctorProfileId, LocalDate date);
+    List<Schedule> findByDoctorProfileIdAndDateAndIsAvailable(Long doctorProfileId, LocalDate date, boolean isAvailable);
+>>>>>>> origin/uyenht
 }

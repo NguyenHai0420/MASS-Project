@@ -1,5 +1,6 @@
 package com.group_project.MASS.service;
 
+import com.group_project.MASS.dto.ScheduleDto;
 import com.group_project.MASS.dto.ScheduleRequest;
 import com.group_project.MASS.dto.ScheduleResponse;
 import com.group_project.MASS.model.DoctorProfile;
@@ -9,6 +10,7 @@ import com.group_project.MASS.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,5 +69,19 @@ public class ScheduleService {
             throw new RuntimeException("Bạn không có quyền xóa schedule này");
         }
         scheduleRepository.deleteById(id);
+    }
+
+    public List<ScheduleDto> getDoctorSchedules(Long doctorId, String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        // Only return available schedules
+        return scheduleRepository.findByDoctorProfileIdAndDateAndIsAvailableTrueOrderByStartTimeAsc(doctorId, localDate)
+                .stream().map(s -> ScheduleDto.builder()
+                        .id(s.getId())
+                        .date(s.getDate())
+                        .startTime(s.getStartTime())
+                        .endTime(s.getEndTime())
+                        .isAvailable(s.isAvailable())
+                        .build()
+                ).collect(Collectors.toList());
     }
 }
