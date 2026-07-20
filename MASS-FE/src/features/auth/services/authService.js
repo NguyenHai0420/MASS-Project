@@ -1,37 +1,20 @@
+import axiosClient from '../../../shared/services/axiosClient';
+
 const authService = {
     login: async (payload) => {
-
         console.log("Login payload:", payload);
-        if(payload.email === "patient@gmail.com" && 
-            payload.password === "123456") {
-            const response = {
-                id: 1,
-                name: "Patient User",
-                email: payload.email,
-                accessToken: "fake-jwt-token"
-            };
-
-            return response;
-        }
-        throw new Error("Invalid email or password");
-
-        // Implementation for login
+        const response = await axiosClient.post('/api/v1/auths/login', payload);
+        return response.data;
     },
     register: async (payload) => {
         console.log("Register payload:", payload);
-        return {
-            id: 2,
-            name: payload.name,
-            email: payload.email,
-            accessToken: "fake-jwt-token"
-        }; 
-
-     
+        const response = await axiosClient.post('/api/v1/auths/register', payload);
+        return response.data;
     },
     logout: async () => {
         console.log("Logout called");
-        return true; 
-       
+        const response = await axiosClient.post('/api/v1/auths/logout');
+        return response.data;
     }
 }
 

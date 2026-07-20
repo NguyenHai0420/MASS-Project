@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Badge, Button, Spinner, Alert, Modal, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import PatientNavbar from '../../../shared/components/PatientNavbar';
-import patientService from '../services/patientService';
+import patientService from '../../patient/services/patientService';
 
 const STATUS_MAPPING = {
   PENDING_PAYMENT: { text: "Chờ thanh toán", bg: "warning" },
@@ -10,14 +9,15 @@ const STATUS_MAPPING = {
   CANCELED: { text: "Đã hủy", bg: "danger" }
 };
 
-const MyAppointmentsPage = () => {
+const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const location = useLocation();
+  const navigate = useNavigate();
   const [alertMsg, setAlertMsg] = useState(location.state?.message || '');
-  
+
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedAppt, setSelectedAppt] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -33,12 +33,8 @@ const MyAppointmentsPage = () => {
       setAppointments(response.data);
     } catch (err) {
       console.error("Failed to fetch appointments", err);
-      // Mock data
-      setAppointments([
-        { id: 1, doctorName: "Dr. Nguyen Van A", date: "2026-07-20", time: "08:00 - 08:30", specialty: "Tim mạch", status: "PENDING_PAYMENT" },
-        { id: 2, doctorName: "Dr. Tran Thi B", date: "2026-07-21", time: "14:00 - 14:30", specialty: "Nhi khoa", status: "PAID" },
-        { id: 3, doctorName: "Dr. Le Van C", date: "2026-07-10", time: "09:00 - 09:30", specialty: "Nội tiết", status: "CANCELED" }
-      ]);
+      setError("Không thể tải danh sách lịch khám. Vui lòng thử lại sau.");
+      setAppointments([]);
     } finally {
       setLoading(false);
     }
@@ -57,30 +53,31 @@ const MyAppointmentsPage = () => {
       fetchAppointments();
     } catch (err) {
       console.error("Cancel failed", err);
-      // Mock cancel success
-      setAlertMsg("Hủy lịch thành công (Mock)!");
-      setAppointments(appointments.map(a => a.id === selectedAppt.id ? { ...a, status: 'CANCELED' } : a));
+      setAlertMsg("Hủy lịch thất bại. Vui lòng thử lại sau.");
     } finally {
       setIsProcessing(false);
       setShowCancelModal(false);
     }
   };
 
-  // Implement Reschedule if needed (navigate to doctor detail with pre-selected state or modal)
+
   const handleReschedule = (appt) => {
-    // Để dời lịch, có thể điều hướng lại trang Bác sĩ để chọn slot mới 
-    // và gọi API update thay vì create (trong phạm vi mock, ta show alert)
-    alert("Tính năng Dời lịch sẽ điều hướng bạn đến trang chọn giờ mới cho Bác sĩ " + appt.doctorName);
+    if (appt.doctorId) {
+      navigate(`/doctors/${appt.doctorId}`, { state: { isReschedule: true, oldAppointmentId: appt.id } });
+    } else {
+      // Fallback if doctorId is somehow missing
+      navigate('/doctors');
+    }
   };
 
   return (
     <>
-      <PatientNavbar />
       <Container className="py-4">
         <h2 className="mb-4">Lịch khám của tôi</h2>
-        
+
         {alertMsg && <Alert variant="success" onClose={() => setAlertMsg('')} dismissible>{alertMsg}</Alert>}
-        
+        {error && <Alert variant="danger">{error}</Alert>}
+
         {loading ? (
           <div className="text-center py-5">
             <Spinner animation="border" variant="primary" />
@@ -156,4 +153,4 @@ const MyAppointmentsPage = () => {
   );
 };
 
-export default MyAppointmentsPage;
+export default MyAppointments;
