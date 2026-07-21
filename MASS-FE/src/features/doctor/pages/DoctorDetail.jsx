@@ -117,18 +117,24 @@ const DoctorDetail = () => {
                       {slots.length === 0 ? (
                         <Alert variant="warning">Bác sĩ không có lịch làm việc trong ngày này.</Alert>
                       ) : (
-                        <div className="d-flex flex-wrap gap-2">
-                          {slots.map(slot => (
-                            <Button
-                              key={slot.id}
-                              variant={slot.isBooked ? "secondary" : "outline-primary"}
-                              disabled={slot.isBooked}
-                              onClick={() => handleSlotClick(slot)}
-                              className="px-4 py-2"
-                            >
-                              {slot.startTime} - {slot.endTime}
-                            </Button>
-                          ))}
+                        <div className="d-flex flex-wrap gap-2 mt-1">
+                          {slots.map(slot => {
+                            const isBooked = !slot.available;
+                            return (
+                              <div
+                                key={slot.id}
+                                className={`appt-slot-card ${isBooked ? 'opacity-50' : ''}`}
+                                style={{ pointerEvents: isBooked ? 'none' : 'auto', cursor: isBooked ? 'not-allowed' : 'pointer' }}
+                                onClick={() => handleSlotClick({...slot, isBooked})}
+                              >
+                                {slot.startTime}
+                                <br />
+                                <span style={{ fontSize: 11, color: '#64748b' }}>STT {slot.queueNumber}</span>
+                                <br />
+                                <span style={{ fontSize: 11, color: '#64748b' }}>{doctor.name}</span>
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
 

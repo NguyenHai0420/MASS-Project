@@ -27,6 +27,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .startTime(s.getStartTime())
                 .endTime(s.getEndTime())
                 .isAvailable(s.isAvailable())
+                .queueNumber((int) (java.time.Duration.between(java.time.LocalTime.of(7, 0), s.getStartTime()).toMinutes() / 30) + 1)
                 .build()
             ).collect(Collectors.toList());
     }
