@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Container, Table, Badge, Row, Col, Card } from "react-bootstrap";
+import { Container, Table, Badge, Row, Col, Card, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../shared/components/DashboardLayout";
 import doctorService from "../services/doctorService";
 
@@ -8,8 +9,6 @@ import doctorService from "../services/doctorService";
 // Trang chủ của Doctor
 // Hiển thị các cuộc hẹn hôm nay
 // ========================
-
-
 
 // Hàm trả về màu badge theo trạng thái
 function getStatusBadge(status) {
@@ -24,6 +23,7 @@ function getStatusBadge(status) {
 
 export default function DoctorDashboardPage() {
     const [appointments, setAppointments] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchData();
@@ -43,7 +43,7 @@ export default function DoctorDashboardPage() {
 
     // Thống kê nhanh
     const total = appointments.length;
-    const pending = appointments.filter((a) => a.status === "PENDING").length;
+    const pending = appointments.filter((a) => a.status === "PENDING" || a.status === "CONFIRMED").length;
     const completed = appointments.filter((a) => a.status === "COMPLETED").length;
 
     return (
@@ -81,7 +81,7 @@ export default function DoctorDashboardPage() {
 
                 {/* Danh sách hẹn hôm nay */}
                 <h5>Danh sách hẹn hôm nay</h5>
-                <Table striped bordered hover>
+                <Table striped bordered hover responsive>
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -89,12 +89,13 @@ export default function DoctorDashboardPage() {
                             <th>Giờ hẹn</th>
                             <th>Lý do khám</th>
                             <th>Trạng thái</th>
+                            <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {appointments.map((a) => (
+                        {appointments.map((a, index) => (
                             <tr key={a.id}>
-                                <td>{a.queueNumber}</td>
+                                <td>{a.queueNumber || (index + 1)}</td>
                                 <td>{a.patientName}</td>
                                 <td>{a.scheduleStartTime?.substring(0, 5)} - {a.scheduleEndTime?.substring(0, 5)}</td>
                                 <td>{a.reason}</td>
@@ -103,8 +104,35 @@ export default function DoctorDashboardPage() {
                                         {a.status}
                                     </Badge>
                                 </td>
+                                <td>
+                                    {a.status !== "COMPLETED" && a.status !== "CANCELLED" && (
+                                        <Button
+                                            variant="success"
+                                            size="sm"
+                                            onClick={() => navigate(`/doctor/medical-record/${a.id}`)}
+                                        >
+                                            ⚡ Khám xong (Process)
+                                        </Button>
+                                    )}
+                                    {a.status === "COMPLETED" && (
+                                        <Button
+                                            variant="outline-secondary"
+                                            size="sm"
+                                            onClick={() => navigate(`/doctor/medical-record/${a.id}`)}
+                                        >
+                                            Xem kết quả
+                                        </Button>
+                                    )}
+                                </td>
                             </tr>
                         ))}
+                        {appointments.length === 0 && (
+                            <tr>
+                                <td colSpan="6" className="text-center text-muted py-3">
+                                    Không có cuộc hẹn nào trong ngày hôm nay.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </Table>
             </Container>

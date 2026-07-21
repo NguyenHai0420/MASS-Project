@@ -1,13 +1,22 @@
-package com.group_project.MASS.service;
+package com.group_project.MASS.service.impl;
 
 import com.group_project.MASS.dto.ScheduleDto;
 import com.group_project.MASS.dto.ScheduleRequest;
 import com.group_project.MASS.dto.ScheduleResponse;
+import com.group_project.MASS.model.DoctorProfile;
+import com.group_project.MASS.model.Schedule;
+import com.group_project.MASS.repository.DoctorProfileRepository;
+import com.group_project.MASS.repository.ScheduleRepository;
+import com.group_project.MASS.service.ScheduleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class ScheduleService {
+public class ScheduleServiceImpl implements ScheduleService {
 
     @Autowired
     private ScheduleRepository scheduleRepository;
@@ -15,24 +24,6 @@ public class ScheduleService {
     @Autowired
     private DoctorProfileRepository doctorProfileRepository;
 
-    // --- Phương thức cho Patient ---
-    public List<ScheduleDto> getDoctorSchedules(Long doctorId, String date) {
-        LocalDate localDate = LocalDate.parse(date);
-        // Only return available schedules
-        return scheduleRepository.findByDoctorProfileIdAndDateAndIsAvailable(doctorId, localDate, true)
-            .stream().map(s -> ScheduleDto.builder()
-                .id(s.getId())
-                .date(s.getDate())
-                .startTime(s.getStartTime())
-                .endTime(s.getEndTime())
-                .isAvailable(s.isAvailable())
-                .build()
-            ).collect(Collectors.toList());
-    }
-
-    // --- Các phương thức cho Doctor ---
-
-    // Chuyển Schedule entity → ScheduleResponse DTO
     private ScheduleResponse toResponse(Schedule schedule) {
         return ScheduleResponse.builder()
                 .id(schedule.getId())
@@ -43,7 +34,7 @@ public class ScheduleService {
                 .build();
     }
 
-    // Lấy tất cả schedule của doctor đang đăng nhập (theo email)
+    @Override
     public List<ScheduleResponse> getMySchedules(String email) {
         DoctorProfile dp = doctorProfileRepository.findByUserEmail(email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy DoctorProfile cho email: " + email));
@@ -53,7 +44,7 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
-    // Tạo schedule mới cho doctor đang đăng nhập
+    @Override
     public ScheduleResponse createSchedule(String email, ScheduleRequest request) {
         DoctorProfile dp = doctorProfileRepository.findByUserEmail(email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy DoctorProfile cho email: " + email));
@@ -68,16 +59,28 @@ public class ScheduleService {
         return toResponse(scheduleRepository.save(schedule));
     }
 
-    // Xóa schedule (chỉ xóa được schedule của chính mình)
+    @Override
     public void deleteSchedule(Long id, String email) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy schedule với id: " + id));
 
-        // Kiểm tra schedule có thuộc về doctor này không
         if (!schedule.getDoctorProfile().getUser().getEmail().equals(email)) {
             throw new RuntimeException("Bạn không có quyền xóa schedule này");
         }
         scheduleRepository.deleteById(id);
     }
 
+    @Override
+    public List<ScheduleDto> getDoctorSchedules(Long doctorId, String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        return scheduleRepository.findByDoctorProfileIdAndDateAndIsAvailableTrueOrderByStartTimeAsc(doctorId, localDate)
+                .stream().map(s -> ScheduleDto.builder()
+                        .id(s.getId())
+                        .date(s.getDate())
+                        .startTime(s.getStartTime())
+                        .endTime(s.getEndTime())
+                        .isAvailable(s.isAvailable())
+                        .build()
+                ).collect(Collectors.toList());
+    }
 }
