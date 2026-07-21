@@ -18,7 +18,6 @@ public class DoctorAppointmentController {
     @Autowired
     private AppointmentService appointmentService;
 
-    // GET /api/doctor/appointments — Lấy tất cả appointments của doctor hiện tại
     @GetMapping
     public ResponseEntity<List<AppointmentResponse>> getMyAppointments(Authentication authentication) {
         String email = authentication.getName();  // lấy email từ JWT

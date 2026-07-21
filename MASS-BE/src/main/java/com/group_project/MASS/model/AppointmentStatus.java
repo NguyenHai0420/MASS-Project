@@ -6,5 +6,6 @@ public enum AppointmentStatus {
     WAITING_FOR_TURN, // Patient has checked in but is waiting for their turn
     CANCELLED, // Appointment is cancelled by the patient or the clinic
     COMPLETED, // Appointment is completed successfully
-    NO_SHOW // Patient did not show up for the appointment
+    NO_SHOW,
+    PENDING// Patient did not show up for the appointment
 }
