@@ -66,19 +66,25 @@ const BaseProfileForm = () => {
     try {
       setSaving(true);
       setMessage({ type: "", text: "" });
-      const updatedData = {
+      const payload = {
         fullName: profile.fullName,
         phone: profile.phone,
         address: profile.address,
         gender: profile.gender,
-        dateOfBirth: profile.dateOfBirth,
         avatarUrl: profile.avatarUrl
       };
+
+      // Handle empty date string causing backend parsing errors
+      if (profile.dateOfBirth && profile.dateOfBirth.trim() !== "") {
+        payload.dateOfBirth = profile.dateOfBirth;
+      } else {
+        payload.dateOfBirth = null;
+      }
       
-      let finalProfile = { ...profile, ...updatedData };
+      let finalProfile = { ...profile, ...payload };
       
       try {
-        const res = await profileService.updateProfile(updatedData);
+        const res = await profileService.updateProfile(payload);
         finalProfile = res.data;
         setMessage({ type: "success", text: "Profile updated successfully!" });
       } catch (error) {
