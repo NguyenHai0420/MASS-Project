@@ -9,6 +9,8 @@ import Home from "../features/home/pages/Home";
 import BookAppointment from "../features/appointment/pages/BookAppointment";
 import DoctorList from "../features/doctor/pages/DoctorList";
 import AppointmentListPage from "../features/appointment/pages/AppointmentListPage";
+import MyAppointments from "../features/appointment/pages/MyAppointments";
+import DoctorDetail from "../features/doctor/pages/DoctorDetail";
 import Navbar from "../shared/components/Navbar";
 import Footer from "../shared/components/Footer";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -25,8 +27,9 @@ function App() {
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Home />} />
-              <Route path="/bookAppointment" element={<BookAppointment />} />
+              <Route path="/book-appointment" element={<BookAppointment />} />
               <Route path="/doctors" element={<DoctorList />} />
+              <Route path="/doctors/:id" element={<DoctorDetail />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -38,7 +41,12 @@ function App() {
                 <Route path="/appointments" element={<AppointmentListPage />} />
               </Route>
 
-              {/* Protected routes example */}
+              {/* Module Patient */}
+              <Route element={<PrivateRoute allowedRoles={["ROLE_PATIENT"]} />}>
+                <Route path="/my-appointments" element={<MyAppointments />} />
+              </Route>
+
+              {/* Protected routes common */}
               <Route element={<PrivateRoute allowedRoles={["ROLE_PATIENT", "ROLE_DOCTOR", "ROLE_RECEPTIONIST", "ROLE_ADMIN"]} />}>
                 <Route path="/dashboard" element={<div>Welcome to Dashboard</div>} />
                 <Route path="/profile" element={<Profile />} />

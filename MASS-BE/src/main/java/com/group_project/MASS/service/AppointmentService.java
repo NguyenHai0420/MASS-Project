@@ -7,6 +7,9 @@ import com.group_project.MASS.dto.request.UpdateAppointmentStatusRequest;
 import com.group_project.MASS.dto.response.*;
 import com.group_project.MASS.model.AppointmentStatus;
 import com.group_project.MASS.model.Specialty;
+import com.group_project.MASS.dto.AppointmentDto;
+import com.group_project.MASS.dto.AppointmentRequestDto;
+import com.group_project.MASS.dto.RescheduleRequestDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -37,4 +40,9 @@ public interface AppointmentService {
     List<AvailableScheduleResponse> getAvailableSchedules(Long specialtyId, Long doctorProfileId, LocalDate date, LocalTime fromTime);
 
     AppointmentDetailResponse checkInAppointment(Long appointmentId);
+
+    AppointmentDto bookAppointment(AppointmentRequestDto request, String patientEmail);
+    List<AppointmentDto> getMyAppointments(String patientEmail);
+    AppointmentDto cancelAppointment(Long appointmentId, String patientEmail);
+    AppointmentDto rescheduleAppointment(Long appointmentId, RescheduleRequestDto request, String patientEmail);
 }

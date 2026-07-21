@@ -1,6 +1,7 @@
 package com.group_project.MASS.repository;
 
 import com.group_project.MASS.model.Appointment;
+
 import com.group_project.MASS.model.AppointmentStatus;
 import com.group_project.MASS.model.AppointmentType;
 import org.springframework.data.domain.Page;
@@ -53,4 +54,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
     boolean existsByDoctorProfileIdAndScheduleDateAndScheduleStartTimeAndStatusNot(
             Long doctorProfileId, LocalDate date, LocalTime startTime, AppointmentStatus status
     );
+    List<Appointment> findByPatientIdOrderByCreatedAtDesc(Long patientId);
 }

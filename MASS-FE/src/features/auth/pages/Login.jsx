@@ -16,6 +16,7 @@ const Login = () => {
     try {
       const response = await authService.login({ email, password });
       login(response.data);
+
       const role = response.data.role;
       if (role === "ROLE_ADMIN") {
         navigate("/dashboard");
@@ -25,6 +26,7 @@ const Login = () => {
         navigate("/profile");
       } else {
         navigate("/");
+
       }
     } catch (error) {
       setError("Login failed. Please check your credentials or ensure your account is verified.");
