@@ -31,6 +31,9 @@ public class DataSeeder implements CommandLineRunner {
     private AppointmentRepository appointmentRepository;
 
     @Autowired
+    private ClinicInformationRepository clinicInformationRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -149,6 +152,17 @@ public class DataSeeder implements CommandLineRunner {
                     .role(Role.ROLE_PATIENT)
                     .build();
             userRepository.save(patient);
+        }
+
+        if (clinicInformationRepository.count() == 0) {
+            ClinicInformation clinic = ClinicInformation.builder()
+                    .name("Phòng khám Đa khoa MASS")
+                    .address("Số 1 Đại Cồ Việt, Bách Khoa, Hai Bà Trưng, Hà Nội")
+                    .phone("024.1234.5678")
+                    .email("contact@massclinic.vn")
+                    .workingHours("Thứ 2 - Thứ 7: 8:00 - 17:30")
+                    .build();
+            clinicInformationRepository.save(clinic);
         }
     }
 }
