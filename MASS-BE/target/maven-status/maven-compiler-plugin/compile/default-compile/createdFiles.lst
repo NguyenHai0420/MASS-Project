@@ -20,6 +20,7 @@ com\group_project\MASS\dto\SpecialtyDto.class
 com\group_project\MASS\controller\UserAdminController.class
 com\group_project\MASS\dto\UserResponse.class
 com\group_project\MASS\repository\SpecialtyRepository.class
+com\group_project\MASS\service\impl\DoctorServiceImpl.class
 com\group_project\MASS\service\PaymentService.class
 com\group_project\MASS\dto\AppointmentResponse.class
 com\group_project\MASS\dto\SpecialtyResponse$SpecialtyResponseBuilder.class
@@ -55,6 +56,7 @@ com\group_project\MASS\service\AuthService.class
 com\group_project\MASS\model\Role.class
 com\group_project\MASS\exception\GlobalExceptionHandler.class
 com\group_project\MASS\service\ClinicInformationService.class
+com\group_project\MASS\service\impl\ClinicInformationServiceImpl.class
 com\group_project\MASS\repository\DoctorProfileRepository.class
 com\group_project\MASS\controller\StatisticsController.class
 com\group_project\MASS\dto\response\PaymentLinkResponse.class
@@ -77,6 +79,7 @@ com\group_project\MASS\dto\request\RegisterRequest.class
 com\group_project\MASS\dto\UserProfileDto$UserProfileDtoBuilder.class
 com\group_project\MASS\dto\DoctorDto$DoctorDtoBuilder.class
 com\group_project\MASS\model\AppointmentStatus.class
+com\group_project\MASS\service\impl\UserAdminServiceImpl.class
 com\group_project\MASS\dto\AppointmentRequestDto.class
 com\group_project\MASS\controller\ScheduleController.class
 com\group_project\MASS\dto\AppointmentDto$AppointmentDtoBuilder.class
@@ -88,6 +91,7 @@ com\group_project\MASS\dto\ClinicInformationResponse$ClinicInformationResponseBu
 com\group_project\MASS\dto\ScheduleDto$ScheduleDtoBuilder.class
 com\group_project\MASS\dto\DoctorRequest.class
 com\group_project\MASS\model\Review$ReviewBuilder.class
+com\group_project\MASS\service\impl\ScheduleServiceImpl.class
 com\group_project\MASS\dto\RescheduleRequestDto.class
 com\group_project\MASS\model\MedicalRecord.class
 com\group_project\MASS\controller\PaymentController.class
@@ -109,6 +113,7 @@ com\group_project\MASS\dto\request\UpdateAppointmentStatusRequest.class
 com\group_project\MASS\model\PasswordResetToken$PasswordResetTokenBuilder.class
 com\group_project\MASS\security\UserDetailsServiceImpl.class
 com\group_project\MASS\dto\response\DoctorResponse$DoctorResponseBuilder.class
+com\group_project\MASS\service\impl\MedicalRecordServiceImpl.class
 com\group_project\MASS\service\UserService.class
 com\group_project\MASS\repository\NotificationRepository.class
 com\group_project\MASS\service\DoctorService.class
@@ -130,6 +135,8 @@ com\group_project\MASS\model\Specialty$SpecialtyBuilder.class
 com\group_project\MASS\dto\PatientStatsResponse$PatientStatsResponseBuilder.class
 com\group_project\MASS\model\Schedule.class
 com\group_project\MASS\model\PasswordResetToken.class
+com\group_project\MASS\service\impl\StatisticsServiceImpl.class
+com\group_project\MASS\service\impl\DoctorProfileServiceImpl.class
 com\group_project\MASS\dto\response\PageResponse.class
 com\group_project\MASS\service\MedicalRecordService.class
 com\group_project\MASS\controller\DoctorScheduleController.class
@@ -147,3 +154,4 @@ com\group_project\MASS\dto\response\AuthResponse.class
 com\group_project\MASS\model\AppointmentType.class
 com\group_project\MASS\security\JwtAuthFilter.class
 com\group_project\MASS\dto\response\AppointmentDetailResponse$AppointmentDetailResponseBuilder.class
+com\group_project\MASS\service\impl\SpecialtyServiceImpl.class

@@ -32,9 +32,11 @@ export default function DoctorDashboardPage() {
     const fetchData = async () => {
         try {
             const data = await doctorService.getMyAppointments();
-            // Lọc các cuộc hẹn trong ngày hôm nay (YYYY-MM-DD)
+            // Lọc các cuộc hẹn trong ngày hôm nay (YYYY-MM-DD) và chưa COMPLETED
             const todayStr = new Date().toLocaleDateString('en-CA');
-            const todayAppointments = data.filter(a => a.scheduleDate === todayStr);
+            const todayAppointments = data.filter(a => 
+                a.scheduleDate === todayStr && a.status !== "COMPLETED"
+            );
             setAppointments(todayAppointments);
         } catch (error) {
             console.error("Lỗi tải lịch hẹn:", error);
@@ -105,7 +107,7 @@ export default function DoctorDashboardPage() {
                                     </Badge>
                                 </td>
                                 <td>
-                                    {a.status !== "COMPLETED" && a.status !== "CANCELLED" && (
+                                    {a.status === "WAITING_FOR_TURN" && (
                                         <Button
                                             variant="success"
                                             size="sm"

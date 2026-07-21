@@ -23,8 +23,12 @@ const AppNavbar = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/">Home</Nav.Link>
-            <Nav.Link as={Link} to="/doctors">Danh sách Bác sĩ</Nav.Link>
-            <Nav.Link as={Link} to="/my-appointments">Lịch hẹn của tôi</Nav.Link>
+            {(!user || user.role === "ROLE_PATIENT") && (
+              <Nav.Link as={Link} to="/doctors">Danh sách Bác sĩ</Nav.Link>
+            )}
+            {user && user.role === "ROLE_PATIENT" && (
+              <Nav.Link as={Link} to="/my-appointments">Lịch hẹn của tôi</Nav.Link>
+            )}
             {user && user.role === "ROLE_ADMIN" && (
               <Nav.Link as={Link} to="/admin/dashboard">⚙️ Dashboard</Nav.Link>
             )}

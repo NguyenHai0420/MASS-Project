@@ -38,22 +38,22 @@ function Sidebar() {
                 {user?.role === ROLES.ADMIN && (
                     <>
                         <Nav.Link as={Link} to="/admin/dashboard" className="text-white">
-                            📊 Dashboard
+                            Dashboard
                         </Nav.Link>
                         <Nav.Link as={Link} to="/admin/specialties" className="text-white">
-                            🏥 Quản lý Chuyên khoa
+                            Quản lý Chuyên khoa
                         </Nav.Link>
                         <Nav.Link as={Link} to="/admin/doctors" className="text-white">
-                            👨‍⚕️ Quản lý Bác sĩ
+                            Quản lý Bác sĩ
                         </Nav.Link>
                         <Nav.Link as={Link} to="/admin/users" className="text-white">
-                            👥 Quản lý Người dùng
+                            Quản lý Người dùng
                         </Nav.Link>
                         <Nav.Link as={Link} to="/admin/clinic" className="text-white">
-                            🏢 Quản lý Phòng khám
+                            Quản lý Phòng khám
                         </Nav.Link>
                         <Nav.Link as={Link} to="/admin/statistics" className="text-white">
-                            📈 Thống kê báo cáo
+                            Thống kê báo cáo
                         </Nav.Link>
                     </>
                 )}

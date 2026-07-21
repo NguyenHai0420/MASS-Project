@@ -79,7 +79,7 @@ export default function MedicalRecordPage() {
                 navigate("/doctor/appointments");
             }, 700);
         } catch (error) {
-            toast.error("Lưu kết quả thất bại!");
+            toast.error(error.response?.data || "Lưu kết quả thất bại!");
         }
     };
 

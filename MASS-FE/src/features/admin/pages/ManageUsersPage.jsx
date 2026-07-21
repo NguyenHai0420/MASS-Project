@@ -5,11 +5,6 @@ import toast, { Toaster } from "react-hot-toast";
 import DashboardLayout from "../../../shared/components/DashboardLayout";
 import adminService from "../services/adminService";
 
-// ========================
-// UC-M10 — Manage User Accounts
-// Admin quản lý tài khoản người dùng
-// ========================
-
 // Hàm trả về màu badge theo role
 function getRoleBadge(role) {
     if (role === "ADMIN" || role === "ROLE_ADMIN") return "danger";
@@ -96,7 +91,7 @@ export default function ManageUsersPage() {
         <DashboardLayout>
             <Container fluid>
                 <Toaster />
-                <h4 className="mb-3">👥 Quản lý Người dùng</h4>
+                <h4 className="mb-3">Quản lý Người dùng</h4>
 
                 <Table striped bordered hover>
                     <thead>
@@ -130,30 +125,34 @@ export default function ManageUsersPage() {
                                     )}
                                 </td>
                                 <td>
-                                    <Button
-                                        variant="warning"
-                                        size="sm"
-                                        className="me-2"
-                                        onClick={() => handleShowEdit(item)}
-                                    >
-                                        Sửa
-                                    </Button>
-                                    {item.active !== false ? (
-                                        <Button
-                                            variant="danger"
-                                            size="sm"
-                                            onClick={() => handleDelete(item.id)}
-                                        >
-                                            Khóa
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            variant="success"
-                                            size="sm"
-                                            onClick={() => handleRestore(item.id)}
-                                        >
-                                            Mở khóa
-                                        </Button>
+                                    {item.role !== "ADMIN" && item.role !== "ROLE_ADMIN" && (
+                                        <>
+                                            <Button
+                                                variant="warning"
+                                                size="sm"
+                                                className="me-2"
+                                                onClick={() => handleShowEdit(item)}
+                                            >
+                                                Sửa
+                                            </Button>
+                                            {item.active !== false ? (
+                                                <Button
+                                                    variant="danger"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(item.id)}
+                                                >
+                                                    Khóa
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    variant="success"
+                                                    size="sm"
+                                                    onClick={() => handleRestore(item.id)}
+                                                >
+                                                    Mở khóa
+                                                </Button>
+                                            )}
+                                        </>
                                     )}
                                 </td>
                             </tr>

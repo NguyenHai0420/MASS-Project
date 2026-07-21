@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Container, Table, Badge, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import DashboardLayout from "../../../shared/components/DashboardLayout";
 import doctorService from "../services/doctorService";
+import MedicalRecordModal from "../components/MedicalRecordModal";
 
 // ========================
 // UC-M23 — Appointment List
@@ -21,7 +22,10 @@ function getStatusBadge(status) {
 
 export default function AppointmentListPage() {
     const [appointments, setAppointments] = useState([]);
-    const navigate = useNavigate();
+    
+    // Modal states
+    const [showModal, setShowModal] = useState(false);
+    const [selectedAppt, setSelectedAppt] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -36,14 +40,19 @@ export default function AppointmentListPage() {
         }
     };
 
-    // Chuyển đến trang nhập kết quả khám
-    const handleRecord = (appointmentId) => {
-        navigate(`/doctor/medical-record/${appointmentId}`);
+    const handleRecord = (appt) => {
+        setSelectedAppt(appt);
+        setShowModal(true);
+    };
+
+    const handleModalSuccess = () => {
+        fetchData(); // Reload list
     };
 
     return (
         <DashboardLayout>
             <Container fluid>
+                <Toaster />
                 <h4 className="mb-3">📝 Danh sách cuộc hẹn</h4>
 
                 <Table striped bordered hover>
@@ -72,12 +81,12 @@ export default function AppointmentListPage() {
                                     </Badge>
                                 </td>
                                 <td>
-                                    {/* Chỉ cho nhập kết quả nếu cuộc hẹn đã CONFIRMED */}
-                                    {a.status === "CONFIRMED" && (
+                                    {/* Chỉ cho nhập kết quả nếu cuộc hẹn đã WAITING_FOR_TURN (đã thanh toán) */}
+                                    {a.status === "WAITING_FOR_TURN" && (
                                         <Button
                                             variant="success"
                                             size="sm"
-                                            onClick={() => handleRecord(a.id)}
+                                            onClick={() => handleRecord(a)}
                                         >
                                             Nhập kết quả
                                         </Button>
@@ -86,7 +95,7 @@ export default function AppointmentListPage() {
                                         <Button
                                             variant="outline-secondary"
                                             size="sm"
-                                            onClick={() => handleRecord(a.id)}
+                                            onClick={() => handleRecord(a)}
                                         >
                                             Xem kết quả
                                         </Button>
@@ -96,6 +105,14 @@ export default function AppointmentListPage() {
                         ))}
                     </tbody>
                 </Table>
+
+                {/* Pop-up xem / sửa kết quả khám bệnh */}
+                <MedicalRecordModal 
+                    show={showModal} 
+                    onHide={() => setShowModal(false)}
+                    appointment={selectedAppt}
+                    onSuccess={handleModalSuccess}
+                />
             </Container>
         </DashboardLayout>
     );

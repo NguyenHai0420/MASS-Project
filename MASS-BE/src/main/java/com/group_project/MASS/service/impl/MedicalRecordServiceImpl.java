@@ -5,8 +5,11 @@ import com.group_project.MASS.dto.MedicalRecordResponse;
 import com.group_project.MASS.model.Appointment;
 import com.group_project.MASS.model.AppointmentStatus;
 import com.group_project.MASS.model.MedicalRecord;
+import com.group_project.MASS.model.Payment;
+import com.group_project.MASS.model.PaymentStatus;
 import com.group_project.MASS.repository.AppointmentRepository;
 import com.group_project.MASS.repository.MedicalRecordRepository;
+import com.group_project.MASS.repository.PaymentRepository;
 import com.group_project.MASS.service.MedicalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,9 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     private MedicalRecordResponse toResponse(MedicalRecord mr) {
         return MedicalRecordResponse.builder()
@@ -46,6 +52,12 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
         if (medicalRecordRepository.findByAppointmentId(request.getAppointmentId()).isPresent()) {
             throw new RuntimeException("Hồ sơ y tế cho cuộc hẹn này đã tồn tại");
+        }
+
+        Payment payment = paymentRepository.findByAppointmentId(request.getAppointmentId())
+                .orElse(null);
+        if (payment == null || payment.getPaymentStatus() != PaymentStatus.COMPLETED) {
+            throw new RuntimeException("Bệnh nhân chưa thanh toán, không thể hoàn thành cuộc hẹn!");
         }
 
         MedicalRecord mr = MedicalRecord.builder()

@@ -96,7 +96,7 @@ function App() {
                 <Route path="/doctor/dashboard" element={<DoctorDashboardPage />} />
                 <Route path="/doctor/schedule" element={<WorkSchedulePage />} />
                 <Route path="/doctor/appointments" element={<AppointmentListPage />} />
-                <Route path="/doctor/medical-record" element={<MedicalRecordPage />} />
+                <Route path="/doctor/medical-record/:appointmentId" element={<MedicalRecordPage />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

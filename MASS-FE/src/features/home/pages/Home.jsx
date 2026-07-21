@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../app/providers/AuthProvider';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   return (
     <>
@@ -16,12 +18,16 @@ const Home = () => {
                 Đặt lịch khám bệnh với các chuyên gia y tế hàng đầu dễ dàng và nhanh chóng qua MASS Clinic.
               </p>
               <div className="d-flex gap-3">
-                <Button variant="primary" size="lg" onClick={() => navigate('/doctors')}>
-                  Đặt lịch ngay
-                </Button>
-                <Button variant="outline-primary" size="lg" onClick={() => navigate('/register')}>
-                  Đăng ký
-                </Button>
+                {(!user || user.role === 'ROLE_PATIENT') && (
+                  <Button variant="primary" size="lg" onClick={() => navigate('/doctors')}>
+                    Đặt lịch ngay
+                  </Button>
+                )}
+                {!user && (
+                  <Button variant="outline-primary" size="lg" onClick={() => navigate('/register')}>
+                    Đăng ký
+                  </Button>
+                )}
               </div>
             </Col>
             <Col md={6} className="text-center mt-4 mt-md-0">
