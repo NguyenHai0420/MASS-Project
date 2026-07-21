@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+<<<<<<< HEAD
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/SELab3/pom.xml" />
+        <option value="$PROJECT_DIR$/MASS-BE/pom.xml" />
+        <option value="$PROJECT_DIR$/SELab04/pom.xml" />
+        <option value="$PROJECT_DIR$/SELab05/Lab5_Phongnthe181783_be/pom.xml" />
+        <option value="$PROJECT_DIR$/SELab06/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_24" default="true" project-jdk-name="openjdk-24" project-jdk-type="JavaSDK">
+=======
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/MASS-BE/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_23" default="true" project-jdk-name="23" project-jdk-type="JavaSDK">
+>>>>>>> origin/haint
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
