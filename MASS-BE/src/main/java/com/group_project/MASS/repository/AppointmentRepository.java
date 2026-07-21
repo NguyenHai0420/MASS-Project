@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
@@ -48,4 +49,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
     // Check if an appointment exists for a specific schedule and status not equal to the given status
     boolean existsByScheduleIdAndStatusNot(Long scheduleId, AppointmentStatus status);
 
+    // Kiểm tra xem bác sĩ đã có lịch hẹn chưa bị hủy tại khung giờ này chưa
+    boolean existsByDoctorProfileIdAndScheduleDateAndScheduleStartTimeAndStatusNot(
+            Long doctorProfileId, LocalDate date, LocalTime startTime, AppointmentStatus status
+    );
 }

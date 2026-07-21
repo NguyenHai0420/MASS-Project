@@ -12,6 +12,8 @@ import java.time.LocalTime;
 import java.util.List;
 
 public interface AppointmentService {
+
+    List<DoctorResponse> getDoctorsBySpecialty(Long specialtyId);
     // Lấy danh sách các cuộc hẹn dựa trên ngày, chuyên khoa và trạng thái
     PageResponse<AppointmentListResponse> getAppointments(LocalDate date, Long specialtyId, AppointmentStatus status, int page, int size);
 

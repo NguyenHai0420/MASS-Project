@@ -17,8 +17,14 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateWalkInAppointmentRequest {
-    @NotNull(message = "ID của bệnh nhân không được để trống")
-    private Long patientId;
+    @NotBlank(message = "Tên bệnh nhân không được để trống")
+    private String patientName;
+
+    @NotBlank(message = "Số điện thoại không được để trống")
+    private String patientPhone;
+
+    @NotBlank(message = "Email bệnh nhân không được để trống")
+    private String patientEmail;
 
     @NotNull(message = "chuyên khoa không được để trống")
     private Long specialtyId;

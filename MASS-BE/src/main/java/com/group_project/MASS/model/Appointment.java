@@ -45,6 +45,7 @@ public class Appointment {
     @Builder.Default
     private AppointmentType type = AppointmentType.ONLINE;
 
+    @Builder.Default
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

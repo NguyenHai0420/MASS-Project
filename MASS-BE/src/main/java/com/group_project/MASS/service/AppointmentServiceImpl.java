@@ -9,6 +9,7 @@ import com.group_project.MASS.mapper.AppointmentMapper;
 import com.group_project.MASS.model.*;
 import com.group_project.MASS.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.time.Duration;
 import java.util.List;
@@ -35,6 +37,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final DoctorProfileRepository doctorProfileRepository;
     private final SpecialtyRepository specialtyRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     // Appointment List
@@ -176,15 +179,22 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         validateWalkInRequest(request);
 
-        User patient = userRepository.findById(request.getPatientId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Không tìm thấy bệnh nhân có ID: "
-                                + request.getPatientId()
-                ));
+        // Lấy hoặc tạo mới bệnh nhân dựa trên email
+        User patient = userRepository.findByEmail(request.getPatientEmail())
+                .orElseGet(() -> {
+                    User newUser = User.builder()
+                            .email(request.getPatientEmail())
+                            .fullName(request.getPatientName())
+                            .phone(request.getPatientPhone())
+                            .password(passwordEncoder.encode(request.getPatientPhone())) // Mật khẩu mặc định là SĐT
+                            .role(Role.ROLE_PATIENT)
+                            .build();
+                    return userRepository.save(newUser);
+                });
 
         if (patient.getRole() != Role.ROLE_PATIENT) {
             throw new IllegalArgumentException(
-                    "Tài khoản được chọn không phải bệnh nhân"
+                    "Email này đã được đăng ký cho tài khoản không phải bệnh nhân"
             );
         }
 
@@ -577,80 +587,72 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new IllegalStateException("Phải chọn chuyên khoa hoặc bác sĩ");
         }
 
-        LocalTime selectedFromTime = determineSearchFromTime(date, fromTime);
-
-        List<Schedule> schedules;
-
         if (doctorProfileId != null) {
             DoctorProfile doctorProfile = doctorProfileRepository
                     .findById(doctorProfileId).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy bác sĩ có ID: " + doctorProfileId));
-
-            /*
-             * Nếu đồng thời truyền specialtyId thì kiểm tra
-             * bác sĩ có thuộc đúng chuyên khoa không.
-             */
-            if (specialtyId != null
-                    && !doctorProfile.getSpecialty()
-                    .getId()
-                    .equals(specialtyId)) {
-                throw new IllegalArgumentException(
-                        "Bác sĩ không thuộc chuyên khoa đã chọn"
-                );
+            if (specialtyId != null && !doctorProfile.getSpecialty().getId().equals(specialtyId)) {
+                throw new IllegalArgumentException("Bác sĩ không thuộc chuyên khoa đã chọn");
             }
-
-            schedules = scheduleRepository
-                    .findByDoctorProfileIdAndDateAndStartTimeGreaterThanEqualAndIsAvailableTrueOrderByStartTimeAsc(
-                            doctorProfileId,
-                            date,
-                            selectedFromTime
-                    );
         } else {
             specialtyRepository.findById(specialtyId)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "Không tìm thấy chuyên khoa có ID: "
-                                    + specialtyId
-                    ));
-
-            schedules = scheduleRepository
-                    .findByDoctorProfileSpecialtyIdAndDateAndStartTimeGreaterThanEqualAndIsAvailableTrueOrderByStartTimeAsc(
-                            specialtyId,
-                            date,
-                            selectedFromTime
-                    );
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy chuyên khoa có ID: " + specialtyId));
         }
 
-        return schedules.stream()
-                /*
-                 * Nếu nhiều bác sĩ có cùng giờ, sắp xếp thêm theo ID bác sĩ
-                 * để kết quả ổn định.
-                 */
-                .sorted(
-                        Comparator.comparing(Schedule::getStartTime)
-                                .thenComparing(
-                                        schedule ->
-                                                schedule.getDoctorProfile().getId()
-                                )
-                )
-                /*
-                 * isAvailable có thể vẫn là true trong khi đã tồn tại
-                 * appointment do dữ liệu chưa đồng bộ. Kiểm tra thêm để an toàn.
-                 */
-                .filter(schedule ->
-                        !appointmentRepository
-                                .existsByScheduleIdAndStatusNot(
-                                        schedule.getId(),
-                                        AppointmentStatus.CANCELLED
-                                )
-                )
-                .map(schedule ->
-                        AppointmentMapper.toScheduleResponse(
-                                schedule,
-                                calculateQueueNumber(
-                                        schedule.getStartTime()
-                                )
-                        )
-                )
-                .toList();
+        LocalTime selectedFromTime = determineSearchFromTime(date, fromTime);
+        List<LocalTime> allDailySlots = generateDailySlots();
+
+        List<AvailableScheduleResponse> responses = new ArrayList<>();
+        long fakeIdCounter = -1L; // Fake ID for UI since schedules are dynamic
+
+        List<DoctorProfile> availableDoctors;
+        if (doctorProfileId != null) {
+            availableDoctors = List.of(doctorProfileRepository.findById(doctorProfileId).get());
+        } else {
+            availableDoctors = doctorProfileRepository.findBySpecialtyId(specialtyId);
+        }
+
+        for (LocalTime slotTime : allDailySlots) {
+            if (slotTime.isBefore(selectedFromTime)) continue;
+
+            // Tìm bác sĩ rảnh trong khung giờ này
+            List<DoctorProfile> freeDoctors = new ArrayList<>();
+            for (DoctorProfile doc : availableDoctors) {
+                boolean isBooked = appointmentRepository.existsByDoctorProfileIdAndScheduleDateAndScheduleStartTimeAndStatusNot(
+                        doc.getId(), date, slotTime, AppointmentStatus.CANCELLED);
+                if (!isBooked) {
+                    freeDoctors.add(doc);
+                }
+            }
+
+            if (!freeDoctors.isEmpty()) {
+                DoctorProfile assignedDoc = freeDoctors.get(0);
+                AvailableScheduleResponse response = AvailableScheduleResponse.builder()
+                        .scheduleId(fakeIdCounter--)
+                        .startTime(slotTime)
+                        .endTime(slotTime.plusMinutes(30))
+                        .queueNumber(calculateQueueNumber(slotTime))
+                        .doctorName(doctorProfileId != null ? assignedDoc.getUser().getFullName() : null)
+                        .build();
+                responses.add(response);
+            }
+        }
+
+        return responses;
+    }
+
+    private List<LocalTime> generateDailySlots() {
+        List<LocalTime> slots = new ArrayList<>();
+        LocalTime time = LocalTime.of(7, 0);
+        while (time.isBefore(LocalTime.of(11, 30))) {
+            slots.add(time);
+            time = time.plusMinutes(30);
+        }
+        time = LocalTime.of(13, 30);
+        while (time.isBefore(LocalTime.of(17, 0))) {
+            slots.add(time);
+            time = time.plusMinutes(30);
+        }
+        return slots;
     }
 
     /*
@@ -674,9 +676,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     private void validateWalkInRequest(
             CreateWalkInAppointmentRequest request
     ) {
-        if (request.getPatientId() == null) {
+        if (request.getPatientEmail() == null || request.getPatientEmail().trim().isEmpty()) {
             throw new IllegalArgumentException(
-                    "Patient ID không được để trống"
+                    "Email bệnh nhân không được để trống"
             );
         }
 
@@ -715,26 +717,22 @@ public class AppointmentServiceImpl implements AppointmentService {
             LocalDate date,
             LocalTime fromTime
     ) {
-        List<Schedule> schedules = scheduleRepository
-                .findByDoctorProfileIdAndDateAndStartTimeGreaterThanEqualAndIsAvailableTrueOrderByStartTimeAsc(
-                        doctorProfileId,
-                        date,
-                        fromTime
-                );
-
-        return schedules.stream()
-                .filter(schedule ->
-                        !appointmentRepository
-                                .existsByScheduleIdAndStatusNot(
-                                        schedule.getId(),
-                                        AppointmentStatus.CANCELLED
-                                )
-                )
-                .min(Comparator.comparing(Schedule::getStartTime))
-                .orElseThrow(() -> new IllegalStateException(
-                        "Bác sĩ không còn slot trống phù hợp trong ngày "
-                                + date
-                ));
+        DoctorProfile doc = doctorProfileRepository.findById(doctorProfileId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy bác sĩ"));
+        
+        List<LocalTime> allSlots = generateDailySlots();
+        for (LocalTime slotTime : allSlots) {
+            if (slotTime.isBefore(fromTime)) continue;
+            
+            boolean isBooked = appointmentRepository.existsByDoctorProfileIdAndScheduleDateAndScheduleStartTimeAndStatusNot(
+                    doc.getId(), date, slotTime, AppointmentStatus.CANCELLED);
+            
+            if (!isBooked) {
+                return getOrCreateSchedule(doc, date, slotTime);
+            }
+        }
+        
+        throw new IllegalStateException("Bác sĩ không còn slot trống phù hợp trong ngày " + date);
     }
 
     /*
@@ -745,32 +743,37 @@ public class AppointmentServiceImpl implements AppointmentService {
             LocalDate date,
             LocalTime fromTime
     ) {
-        List<Schedule> schedules = scheduleRepository
-                .findByDoctorProfileSpecialtyIdAndDateAndStartTimeGreaterThanEqualAndIsAvailableTrueOrderByStartTimeAsc(
-                        specialtyId,
-                        date,
-                        fromTime
-                );
+        List<DoctorProfile> availableDoctors = doctorProfileRepository.findBySpecialtyId(specialtyId);
+        if (availableDoctors.isEmpty()) {
+             throw new IllegalStateException("Không có bác sĩ nào thuộc chuyên khoa này");
+        }
+        
+        List<LocalTime> allSlots = generateDailySlots();
+        for (LocalTime slotTime : allSlots) {
+            if (slotTime.isBefore(fromTime)) continue;
+            
+            for (DoctorProfile doc : availableDoctors) {
+                boolean isBooked = appointmentRepository.existsByDoctorProfileIdAndScheduleDateAndScheduleStartTimeAndStatusNot(
+                        doc.getId(), date, slotTime, AppointmentStatus.CANCELLED);
+                
+                if (!isBooked) {
+                    return getOrCreateSchedule(doc, date, slotTime);
+                }
+            }
+        }
+        
+        throw new IllegalStateException("Không còn slot trống của chuyên khoa trong ngày " + date);
+    }
 
-        return schedules.stream()
-                .filter(schedule ->
-                        !appointmentRepository
-                                .existsByScheduleIdAndStatusNot(
-                                        schedule.getId(),
-                                        AppointmentStatus.CANCELLED
-                                )
-                )
-                .min(
-                        Comparator.comparing(Schedule::getStartTime)
-                                .thenComparing(
-                                        schedule ->
-                                                schedule.getDoctorProfile().getId()
-                                )
-                )
-                .orElseThrow(() -> new IllegalStateException(
-                        "Không còn slot trống của chuyên khoa "
-                                + "trong ngày " + date
-                ));
+    private Schedule getOrCreateSchedule(DoctorProfile doc, LocalDate date, LocalTime slotTime) {
+        return scheduleRepository.findByDoctorProfileIdAndDateAndStartTime(doc.getId(), date, slotTime)
+                .orElseGet(() -> scheduleRepository.save(Schedule.builder()
+                        .doctorProfile(doc)
+                        .date(date)
+                        .startTime(slotTime)
+                        .endTime(slotTime.plusMinutes(30))
+                        .isAvailable(true)
+                        .build()));
     }
 
     /*
@@ -1043,5 +1046,18 @@ public class AppointmentServiceImpl implements AppointmentService {
         return schedule.getDate().isEqual(LocalDate.now())
                 && schedule.getStartTime()
                 .isAfter(LocalTime.now());
+    }
+
+    @Override
+    public List<DoctorResponse> getDoctorsBySpecialty(Long specialtyId) {
+        List<DoctorProfile> doctorProfiles = doctorProfileRepository.findBySpecialtyId(specialtyId);
+        return doctorProfiles.stream().map(dp -> DoctorResponse.builder()
+                .doctorProfileId(dp.getId())
+                .userId(dp.getUser().getId())
+                .fullName(dp.getUser().getFullName())
+                .avatarUrl(dp.getUser().getAvatarUrl())
+                .specialtyName(dp.getSpecialty() != null ? dp.getSpecialty().getName() : null)
+                .build()
+        ).toList();
     }
 }

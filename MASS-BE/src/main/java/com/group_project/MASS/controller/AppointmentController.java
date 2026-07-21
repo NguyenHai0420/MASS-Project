@@ -71,6 +71,13 @@ public class AppointmentController {
                 .ok(appointmentService.getAvailableSchedules(specialtyId, doctorProfileId, date, fromTime));
     }
 
+    @GetMapping("/doctors")
+    public ResponseEntity<List<DoctorResponse>> getDoctorsBySpecialty(
+            @RequestParam Long specialtyId
+    ) {
+        return ResponseEntity.ok(appointmentService.getDoctorsBySpecialty(specialtyId));
+    }
+
     @PostMapping("/walk-in")
     public ResponseEntity<AppointmentDetailResponse> createWalkInAppointment(
             @Valid

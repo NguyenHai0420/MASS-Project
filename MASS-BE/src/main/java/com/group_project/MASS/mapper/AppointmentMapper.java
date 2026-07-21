@@ -22,7 +22,7 @@ public final class AppointmentMapper {
                 && payment.getPaymentStatus() == PaymentStatus.COMPLETED;
 
         return AppointmentListResponse.builder()
-                .appointmentId(appointment.getPatient().getId())
+                .appointmentId(appointment.getId())
                 .patientId(appointment.getPatient().getId())
                 .patientName(appointment.getPatient().getFullName())
                 .patientEmail(appointment.getPatient().getEmail())

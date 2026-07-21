@@ -52,6 +52,12 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
             LocalTime startTime
     );
 
+    Optional<Schedule> findByDoctorProfileIdAndDateAndStartTime(
+            Long doctorProfileId,
+            LocalDate date,
+            LocalTime startTime
+    );
+
     // Lấy schedule theo ID và trạng thái còn trống.
     Optional<Schedule> findByIdAndIsAvailableTrue(Long id);
 }

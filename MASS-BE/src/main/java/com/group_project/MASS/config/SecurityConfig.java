@@ -56,7 +56,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
-                auth.requestMatchers("/api/v1/auths/**", "/api/receptionist/**").permitAll()
+                auth.requestMatchers("/api/v1/auths/**", "/api/receptionist/**", "/api/payments/**").permitAll()
 //                        .requestMatchers(
 //                                "/api/receptionist/**"
 //                        ).hasRole("RECEPTIONIST")
