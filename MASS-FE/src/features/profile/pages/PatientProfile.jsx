@@ -32,7 +32,6 @@ const PatientProfile = () => {
     };
     fetchAppointments();
   }, []);
-
   return (
     <Container className="py-5">
       <Row>

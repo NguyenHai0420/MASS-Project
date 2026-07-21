@@ -10,6 +10,7 @@ import BookAppointment from "../features/appointment/pages/BookAppointment";
 import MyAppointments from "../features/appointment/pages/MyAppointments";
 import DoctorList from "../features/doctor/pages/DoctorList";
 import DoctorDetail from "../features/doctor/pages/DoctorDetail";
+import AppointmentListPage from "../features/appointment/pages/AppointmentListPage";
 import Navbar from "../shared/components/Navbar";
 import Footer from "../shared/components/Footer";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -27,6 +28,7 @@ function App() {
           {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/book-appointment" element={<BookAppointment />} />
+          <Route path="/bookAppointment" element={<BookAppointment />} />
           <Route path="/doctors" element={<DoctorList />} />
           <Route path="/doctors/:id" element={<DoctorDetail />} />
           <Route path="/my-appointments" element={<MyAppointments />} />
@@ -35,6 +37,11 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-otp" element={<VerifyOtp />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+
+          {/* Module Receptionist */}
+          <Route element={<PrivateRoute allowedRoles={["ROLE_RECEPTIONIST"]} />}>
+            <Route path="/appointments" element={<AppointmentListPage />} />
+          </Route>
 
           {/* Protected routes example */}
           <Route element={<PrivateRoute allowedRoles={["ROLE_PATIENT", "ROLE_DOCTOR", "ROLE_RECEPTIONIST", "ROLE_ADMIN"]} />}>

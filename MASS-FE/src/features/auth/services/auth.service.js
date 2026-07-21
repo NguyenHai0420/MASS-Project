@@ -16,8 +16,12 @@ const authService = {
   forgotPassword: (email) => {
     return axiosClient.post("/api/v1/auths/forgot-password", { email });
   },
-  verifyOtp: (email, otp) => {
-    return axiosClient.post("/api/v1/auths/verify-otp", { email, otp });
+  verifyOtp: async (email, otp) => {
+    return axiosClient.post('/api/v1/auths/verify-otp', { email, otp });
+  },
+
+  verifyRegistrationOtp: async (email, otp) => {
+    return axiosClient.post('/api/v1/auths/verify-registration-otp', { email, otp });
   },
   resetPassword: (email, otp, newPassword) => {
     return axiosClient.post("/api/v1/auths/reset-password", { email, otp, newPassword });

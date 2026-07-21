@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DoctorProfileRepository extends JpaRepository<DoctorProfile, Long> {
@@ -18,4 +19,6 @@ public interface DoctorProfileRepository extends JpaRepository<DoctorProfile, Lo
     
     @Query("SELECT d FROM DoctorProfile d WHERE d.specialty.id = :specialtyId AND d.user.fullName LIKE %:name%")
     List<DoctorProfile> findBySpecialtyIdAndUserFullNameContainingIgnoreCase(@Param("specialtyId") Long specialtyId, @Param("name") String name);
+
+    Optional<DoctorProfile> findUserById(Long userId);
 }

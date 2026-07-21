@@ -6,15 +6,23 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 const VerifyOtp = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
+  const type = searchParams.get("type");
   const [otp, setOtp] = useState("");
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await authService.verifyOtp(email, otp);
-      navigate(`/reset-password?email=${email}&otp=${otp}`);
+      if (type === "register") {
+        await authService.verifyRegistrationOtp(email, otp);
+        setSuccess(true);
+        setTimeout(() => navigate("/login"), 2000);
+      } else {
+        await authService.verifyOtp(email, otp);
+        navigate(`/reset-password?email=${email}&otp=${otp}`);
+      }
     } catch (error) {
       setError("Invalid or expired OTP.");
     }
@@ -26,6 +34,7 @@ const VerifyOtp = () => {
         <h2 className="text-center mb-4">Verify OTP</h2>
         <p className="text-muted text-center">Enter the 6-digit OTP sent to <b>{email}</b></p>
         {error && <div className="alert alert-danger p-2 text-center">{error}</div>}
+        {success && <div className="alert alert-success p-2 text-center">Account verified successfully! Redirecting to login...</div>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Control type="text" placeholder="123456" maxLength={6} required className="text-center fs-4 tracking-widest" onChange={(e) => setOtp(e.target.value)} />
