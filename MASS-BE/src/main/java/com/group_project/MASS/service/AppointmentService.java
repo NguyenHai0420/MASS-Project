@@ -6,13 +6,14 @@ import com.group_project.MASS.dto.request.UpdateAppointmentRequest;
 import com.group_project.MASS.dto.request.UpdateAppointmentStatusRequest;
 import com.group_project.MASS.dto.response.*;
 import com.group_project.MASS.model.AppointmentStatus;
+import com.group_project.MASS.model.Specialty;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 public interface AppointmentService {
-
+    List<Specialty> getAllSpecialties();
     List<DoctorResponse> getDoctorsBySpecialty(Long specialtyId);
     // Lấy danh sách các cuộc hẹn dựa trên ngày, chuyên khoa và trạng thái
     PageResponse<AppointmentListResponse> getAppointments(LocalDate date, Long specialtyId, AppointmentStatus status, int page, int size);

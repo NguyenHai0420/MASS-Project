@@ -51,6 +51,10 @@ const appointmentService = {
       params: { specialtyId }
     });
   },
+
+  getAllSpecialties: async () => {
+    return axiosClient.get('/api/receptionist/appointments/specialties');
+  },
 };
 
 // Danh sách trạng thái lịch hẹn (đồng bộ với backend enum)
@@ -64,14 +68,6 @@ export const appointmentStatuses = [
   { value: 'NO_SHOW', label: 'Không đến khám' },
 ];
 
-// Danh sách chuyên khoa mẫu (sẽ được thay bằng API sau nếu có)
-export const defaultSpecialties = [
-  { id: 1, name: 'Nội tổng quát' },
-  { id: 2, name: 'Tim mạch' },
-  { id: 3, name: 'Tai Mũi Họng' },
-  { id: 4, name: 'Da liễu' },
-  { id: 5, name: 'Nhi khoa' },
-  { id: 6, name: 'Chấn thương chỉnh hình' },
-];
+
 
 export default appointmentService;

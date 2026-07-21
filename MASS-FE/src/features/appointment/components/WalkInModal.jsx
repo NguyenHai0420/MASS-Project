@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Form, Row, Col, Alert, Spinner } from 'react-bootstrap';
-import appointmentService, { defaultSpecialties } from '../services/appointment.service';
+import appointmentService from '../services/appointment.service';
 
 const WalkInModal = ({ show, onHide, onSuccess }) => {
   const [form, setForm] = useState({
@@ -11,6 +11,8 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
     appointmentDate: '',
     doctorProfileId: '',
     reason: '',
+    dateOfBirth: '',
+    address: '',
   });
 
   const [availableSlots, setAvailableSlots] = useState([]);
@@ -21,8 +23,29 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
   const [doctors, setDoctors] = useState([]);
   const [loadingDoctors, setLoadingDoctors] = useState(false);
 
+  // State danh sách chuyên khoa
+  const [specialties, setSpecialties] = useState([]);
+  const [loadingSpecialties, setLoadingSpecialties] = useState(false);
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Tải danh sách chuyên khoa khi component mount
+  useEffect(() => {
+    async function fetchSpecialties() {
+      setLoadingSpecialties(true);
+      try {
+        const res = await appointmentService.getAllSpecialties();
+        setSpecialties(res.data || []);
+      } catch (err) {
+        console.error('Lỗi tải danh sách chuyên khoa:', err);
+        setSpecialties([]);
+      } finally {
+        setLoadingSpecialties(false);
+      }
+    }
+    fetchSpecialties();
+  }, []);
 
   // Tải danh sách bác sĩ khi chọn chuyên khoa
   useEffect(() => {
@@ -90,6 +113,8 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
     if (!form.patientName.trim()) return setError('Vui lòng nhập tên bệnh nhân.');
     if (!form.patientPhone.trim()) return setError('Vui lòng nhập số điện thoại.');
     if (!form.patientEmail.trim()) return setError('Vui lòng nhập email bệnh nhân.');
+    if (!form.dateOfBirth) return setError('Vui lòng nhập ngày sinh.');
+    if (!form.address.trim()) return setError('Vui lòng nhập địa chỉ.');
     if (!form.specialtyId) return setError('Vui lòng chọn chuyên khoa.');
     if (!form.appointmentDate) return setError('Vui lòng chọn ngày khám.');
     if (!form.reason.trim()) return setError('Vui lòng nhập lý do khám.');
@@ -102,6 +127,8 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
         patientName: form.patientName.trim(),
         patientPhone: form.patientPhone.trim(),
         patientEmail: form.patientEmail.trim(),
+        dateOfBirth: form.dateOfBirth,
+        address: form.address.trim(),
         specialtyId: Number(form.specialtyId),
         appointmentDate: form.appointmentDate,
         reason: form.reason.trim(),
@@ -133,7 +160,9 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
         specialtyId: '', 
         appointmentDate: '', 
         doctorProfileId: '', 
-        reason: '' 
+        reason: '',
+        dateOfBirth: '',
+        address: ''
     });
     setAvailableSlots([]);
     setSelectedSlot(null);
@@ -206,6 +235,32 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
               </Form.Group>
             </Col>
 
+            <Col md={4}>
+              <Form.Group>
+                <Form.Label className="appt-modal-label">Ngày sinh *</Form.Label>
+                <Form.Control
+                  className="appt-modal-control"
+                  type="date"
+                  max={today}
+                  value={form.dateOfBirth}
+                  onChange={(e) => handleChange('dateOfBirth', e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+
+            <Col md={8}>
+              <Form.Group>
+                <Form.Label className="appt-modal-label">Địa chỉ *</Form.Label>
+                <Form.Control
+                  className="appt-modal-control"
+                  type="text"
+                  placeholder="Nhập địa chỉ"
+                  value={form.address}
+                  onChange={(e) => handleChange('address', e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+
             <Col md={12}>
               <h6 className="fw-bold mb-0 text-primary mt-2">Thông tin Khám bệnh</h6>
               <hr className="mt-2 mb-3" />
@@ -220,8 +275,8 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
                   value={form.specialtyId}
                   onChange={(e) => handleChange('specialtyId', e.target.value)}
                 >
-                  <option value="">-- Chọn chuyên khoa --</option>
-                  {defaultSpecialties.map((s) => (
+                  <option value="">-- {loadingSpecialties ? 'Đang tải...' : 'Chọn chuyên khoa'} --</option>
+                  {specialties.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.name}
                     </option>

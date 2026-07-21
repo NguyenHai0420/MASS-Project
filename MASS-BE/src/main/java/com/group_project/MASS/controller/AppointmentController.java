@@ -7,6 +7,7 @@ import com.group_project.MASS.dto.request.UpdateAppointmentStatusRequest;
 import com.group_project.MASS.dto.response.*;
 import com.group_project.MASS.model.AppointmentStatus;
 import com.group_project.MASS.service.AppointmentService;
+import com.group_project.MASS.model.Specialty;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -76,6 +77,11 @@ public class AppointmentController {
             @RequestParam Long specialtyId
     ) {
         return ResponseEntity.ok(appointmentService.getDoctorsBySpecialty(specialtyId));
+    }
+
+    @GetMapping("/specialties")
+    public ResponseEntity<List<Specialty>> getAllSpecialties() {
+        return ResponseEntity.ok(appointmentService.getAllSpecialties());
     }
 
     @PostMapping("/walk-in")

@@ -26,6 +26,12 @@ public class CreateWalkInAppointmentRequest {
     @NotBlank(message = "Email bệnh nhân không được để trống")
     private String patientEmail;
 
+    @NotNull(message = "Ngày sinh không được để trống")
+    private LocalDate dateOfBirth;
+
+    @NotBlank(message = "Địa chỉ không được để trống")
+    private String address;
+
     @NotNull(message = "chuyên khoa không được để trống")
     private Long specialtyId;
 

@@ -4,7 +4,7 @@ import AppointmentListPosting from './AppointmentListPosting';
 import WalkInModal from '../components/WalkInModal';
 import PaymentModal from '@/features/payment/components/PaymentModal';
 import AppointmentDetailModal from '../components/AppointmentDetailModal';
-import appointmentService, { defaultSpecialties } from '../services/appointment.service';
+import appointmentService from '../services/appointment.service';
 import useAppointmentFilter from '../hooks/useAppointmentFilter';
 import '@/styles/appointment.css';
 
@@ -26,6 +26,15 @@ const AppointmentListPage = () => {
   const [showPayment, setShowPayment] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+  const [specialties, setSpecialties] = useState([]);
+
+  // Fetch specialties
+  useEffect(() => {
+    appointmentService.getAllSpecialties()
+      .then(res => setSpecialties(res.data || []))
+      .catch(console.error);
+  }, []);
 
   // Fetch appointments từ API
   const fetchAppointments = useCallback(async () => {
@@ -118,7 +127,7 @@ const AppointmentListPage = () => {
         setKeyword={setKeyword}
         dispatch={dispatch}
         filters={filters}
-        specialties={defaultSpecialties}
+        specialties={specialties}
       />
 
       {/* Danh sách lịch hẹn */}

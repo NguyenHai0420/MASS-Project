@@ -187,6 +187,8 @@ public class AppointmentServiceImpl implements AppointmentService {
                             .fullName(request.getPatientName())
                             .phone(request.getPatientPhone())
                             .password(passwordEncoder.encode(request.getPatientPhone())) // Mật khẩu mặc định là SĐT
+                            .dateOfBirth(request.getDateOfBirth())
+                            .address(request.getAddress())
                             .role(Role.ROLE_PATIENT)
                             .build();
                     return userRepository.save(newUser);
@@ -1046,6 +1048,11 @@ public class AppointmentServiceImpl implements AppointmentService {
         return schedule.getDate().isEqual(LocalDate.now())
                 && schedule.getStartTime()
                 .isAfter(LocalTime.now());
+    }
+
+    @Override
+    public List<Specialty> getAllSpecialties() {
+        return specialtyRepository.findAll();
     }
 
     @Override
