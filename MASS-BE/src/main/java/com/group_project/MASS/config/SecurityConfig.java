@@ -1,5 +1,7 @@
-package com.group_project.MASS.security;
+package com.group_project.MASS.config;
 
+import com.group_project.MASS.security.JwtAuthFilter;
+import com.group_project.MASS.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,7 +56,10 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> 
-                auth.requestMatchers("/api/v1/auths/**").permitAll()
+                auth.requestMatchers("/api/v1/auths/**", "/api/receptionist/**").permitAll()
+//                        .requestMatchers(
+//                                "/api/receptionist/**"
+//                        ).hasRole("RECEPTIONIST")
                     .anyRequest().authenticated()
             );
 

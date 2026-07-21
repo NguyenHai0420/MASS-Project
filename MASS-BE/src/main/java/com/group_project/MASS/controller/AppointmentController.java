@@ -4,10 +4,7 @@ import com.group_project.MASS.dto.request.CancelAppointmentRequest;
 import com.group_project.MASS.dto.request.CreateWalkInAppointmentRequest;
 import com.group_project.MASS.dto.request.UpdateAppointmentRequest;
 import com.group_project.MASS.dto.request.UpdateAppointmentStatusRequest;
-import com.group_project.MASS.dto.response.ApiMessageResponse;
-import com.group_project.MASS.dto.response.AppointmentDetailResponse;
-import com.group_project.MASS.dto.response.AppointmentListResponse;
-import com.group_project.MASS.dto.response.AvailableScheduleResponse;
+import com.group_project.MASS.dto.response.*;
 import com.group_project.MASS.model.AppointmentStatus;
 import com.group_project.MASS.service.AppointmentService;
 import jakarta.validation.Valid;
@@ -27,17 +24,26 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     @GetMapping
-    public ResponseEntity<List<AppointmentListResponse>> getAppointments(
+    public ResponseEntity<PageResponse<AppointmentListResponse>> getAppointments(
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate date,
             @RequestParam(required = false)
             Long specialtyId,
             @RequestParam(required = false)
-            AppointmentStatus status
+            AppointmentStatus status,
+            @RequestParam(defaultValue = "0")
+            int page,
+            @RequestParam(defaultValue = "10")
+            int size
     ) {
         return ResponseEntity
-                .ok(appointmentService.getAppointments(date, specialtyId, status));
+                .ok(appointmentService.getAppointments(
+                        date,
+                        specialtyId,
+                        status,
+                        page,
+                        size));
     }
 
     @GetMapping("/{appointmentId}")
@@ -48,7 +54,7 @@ public class AppointmentController {
                 .ok(appointmentService.getAppointmentDetail(appointmentId));
     }
 
-    @GetMapping("/available-sheduels")
+    @GetMapping("/available-scheduels")
     public ResponseEntity<List<AvailableScheduleResponse>> getAvailableSheduels(
             @RequestParam(required = false)
             Long specialtyId,
@@ -58,7 +64,7 @@ public class AppointmentController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate date,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
             LocalTime fromTime
     ) {
         return ResponseEntity
@@ -73,6 +79,18 @@ public class AppointmentController {
     ) {
         return ResponseEntity
                 .ok(appointmentService.createWalkInAppointment(request));
+    }
+
+    @PatchMapping("/{appointmentId}/check-in")
+    public ResponseEntity<AppointmentDetailResponse>
+    checkInAppointment(
+            @PathVariable Long appointmentId
+    ) {
+        return ResponseEntity.ok(
+                appointmentService.checkInAppointment(
+                        appointmentId
+                )
+        );
     }
 
     @PutMapping("/{appointmentId}")

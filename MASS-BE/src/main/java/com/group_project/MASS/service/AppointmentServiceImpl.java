@@ -4,19 +4,21 @@ import com.group_project.MASS.dto.request.CancelAppointmentRequest;
 import com.group_project.MASS.dto.request.CreateWalkInAppointmentRequest;
 import com.group_project.MASS.dto.request.UpdateAppointmentRequest;
 import com.group_project.MASS.dto.request.UpdateAppointmentStatusRequest;
-import com.group_project.MASS.dto.response.ApiMessageResponse;
-import com.group_project.MASS.dto.response.AppointmentDetailResponse;
-import com.group_project.MASS.dto.response.AppointmentListResponse;
-import com.group_project.MASS.dto.response.AvailableScheduleResponse;
+import com.group_project.MASS.dto.response.*;
 import com.group_project.MASS.mapper.AppointmentMapper;
 import com.group_project.MASS.model.*;
 import com.group_project.MASS.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.time.Duration;
@@ -38,36 +40,105 @@ public class AppointmentServiceImpl implements AppointmentService {
     // Appointment List
     @Override
     @Transactional(readOnly = true)
-    public List<AppointmentListResponse> getAppointments(LocalDate date,
-                                                         Long specialtyId,
-                                                         AppointmentStatus status) {
+    public PageResponse<AppointmentListResponse> getAppointments(LocalDate date,
+                                                                 Long specialtyId,
+                                                                 AppointmentStatus status,
+                                                                 int page,
+                                                                 int size) {
 
-        LocalDate selectedDate = date != null ? date : LocalDate.now();
-
-        List<Appointment> appointments;
-
-        if (specialtyId != null && status != null) {
-            // filter appointments based on specialtyId and status
-            appointments = appointmentRepository
-                    .findByDoctorProfileSpecialtyIdAndScheduleDateAndStatusOrderByScheduleStartTimeAsc(specialtyId, selectedDate, status);
-
-        } else if (specialtyId != null) {
-            // filter appointments based on specialtyId only
-            appointments = appointmentRepository
-                    .findByDoctorProfileSpecialtyIdAndScheduleDateOrderByScheduleStartTimeAsc(specialtyId, selectedDate);
-        } else if (status != null) {
-            // filter appointments based on status only
-            appointments = appointmentRepository
-                    .findByScheduleDateAndStatusOrderByScheduleStartTimeAsc(selectedDate, status);
-        } else {
-            // no filters, get all appointments for the selected date
-            appointments = appointmentRepository
-                    .findByScheduleDateOrderByScheduleStartTimeAsc(selectedDate);
+        if (page < 0) {
+            throw new IllegalArgumentException("Page không được nhỏ hơn 0");
         }
 
-        return appointments.stream()
-                .map(this::mapToListResponse)
-                .toList();
+        if (size < 1 || size > 100) {
+            throw new IllegalArgumentException("Size phải nằm trong khoảng từ 1 đến 100");
+        }
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(
+                        Sort.Order.asc("schedule.date"),
+                        Sort.Order.asc("schedule.startTime")
+                )
+        );
+
+        Page<Appointment> appointmentPage;
+
+        if (date != null && specialtyId != null && status != null) {
+            appointmentPage = appointmentRepository
+                    .findByDoctorProfileSpecialtyIdAndScheduleDateAndStatus(
+                            specialtyId,
+                            date,
+                            status,
+                            pageable
+                    );
+
+        } else if (date != null && specialtyId != null) {
+            appointmentPage = appointmentRepository
+                    .findByDoctorProfileSpecialtyIdAndScheduleDate(
+                            specialtyId,
+                            date,
+                            pageable
+                    );
+
+        } else if (date != null && status != null) {
+            appointmentPage = appointmentRepository
+                    .findByScheduleDateAndStatus(
+                            date,
+                            status,
+                            pageable
+                    );
+
+        } else if (specialtyId != null && status != null) {
+            appointmentPage = appointmentRepository
+                    .findByDoctorProfileSpecialtyIdAndStatus(
+                            specialtyId,
+                            status,
+                            pageable
+                    );
+
+        } else if (date != null) {
+            appointmentPage = appointmentRepository
+                    .findByScheduleDate(
+                            date,
+                            pageable
+                    );
+
+        } else if (specialtyId != null) {
+            appointmentPage = appointmentRepository
+                    .findByDoctorProfileSpecialtyId(
+                            specialtyId,
+                            pageable
+                    );
+
+        } else if (status != null) {
+            appointmentPage = appointmentRepository
+                    .findByStatus(
+                            status,
+                            pageable
+                    );
+
+        } else {
+            appointmentPage = appointmentRepository
+                    .findAll(pageable);
+        }
+
+        List<AppointmentListResponse> content =
+                appointmentPage.getContent()
+                        .stream()
+                        .map(this::mapToListResponse)
+                        .toList();
+
+        return PageResponse.<AppointmentListResponse>builder()
+                .content(content)
+                .page(appointmentPage.getNumber())
+                .size(appointmentPage.getSize())
+                .totalElements(appointmentPage.getTotalElements())
+                .totalPages(appointmentPage.getTotalPages())
+                .first(appointmentPage.isFirst())
+                .last(appointmentPage.isLast())
+                .build();
     }
 
     // Appointment Detail
@@ -303,6 +374,19 @@ public class AppointmentServiceImpl implements AppointmentService {
             );
         }
 
+        if (currentStatus == AppointmentStatus.PENDING_PAYMENT) {
+            throw new IllegalStateException(
+                    "Appointment đang chờ thanh toán. "
+                            + "Trạng thái sẽ được cập nhật bởi hệ thống thanh toán"
+            );
+        }
+
+        if (newStatus == AppointmentStatus.WAITING_FOR_TURN) {
+            throw new IllegalArgumentException(
+                    "Vui lòng sử dụng chức năng check-in"
+            );
+        }
+
         if (newStatus == AppointmentStatus.CANCELLED) {
             throw new IllegalArgumentException(
                     "Vui lòng sử dụng chức năng hủy lịch "
@@ -326,6 +410,85 @@ public class AppointmentServiceImpl implements AppointmentService {
         return new ApiMessageResponse(
                 "Cập nhật trạng thái appointment thành công: "
                         + newStatus
+        );
+    }
+
+    // check-in
+    @Override
+    public AppointmentDetailResponse checkInAppointment(
+            Long appointmentId
+    ) {
+        Appointment appointment = appointmentRepository
+                .findById(appointmentId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Không tìm thấy lịch khám với ID: "
+                                + appointmentId
+                ));
+
+        if (appointment.getStatus()
+                == AppointmentStatus.WAITING_FOR_TURN) {
+            throw new IllegalStateException(
+                    "Bệnh nhân đã được check-in trước đó"
+            );
+        }
+
+        if (appointment.getStatus()
+                != AppointmentStatus.WAITING_CHECK_IN) {
+            throw new IllegalStateException(
+                    "Chỉ appointment ở trạng thái WAITING_CHECK_IN "
+                            + "mới được check-in"
+            );
+        }
+
+        Schedule schedule = appointment.getSchedule();
+
+        if (!schedule.getDate().isEqual(LocalDate.now())) {
+            throw new IllegalStateException(
+                    "Chỉ có thể check-in trong ngày khám"
+            );
+        }
+
+        /*
+         * Có thể cho phép check-in trước giờ khám.
+         * Ví dụ: tối đa 60 phút.
+         */
+        LocalTime earliestCheckIn =
+                schedule.getStartTime().minusMinutes(60);
+
+        if (LocalTime.now().isBefore(earliestCheckIn)) {
+            throw new IllegalStateException(
+                    "Chưa đến thời gian check-in. "
+                            + "Bệnh nhân chỉ được check-in trước tối đa 60 phút"
+            );
+        }
+
+        Payment payment = paymentRepository
+                .findByAppointmentId(appointmentId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Appointment chưa có thông tin thanh toán"
+                ));
+
+        if (payment.getPaymentStatus()
+                != PaymentStatus.COMPLETED) {
+            throw new IllegalStateException(
+                    "Appointment chưa thanh toán thành công"
+            );
+        }
+
+        appointment.setStatus(
+                AppointmentStatus.WAITING_FOR_TURN
+        );
+
+        appointment.setCheckedInAt(
+                LocalDateTime.now()
+        );
+
+        Appointment savedAppointment =
+                appointmentRepository.save(appointment);
+
+        return AppointmentMapper.toDetailResponse(
+                savedAppointment,
+                payment
         );
     }
 
@@ -837,39 +1000,32 @@ public class AppointmentServiceImpl implements AppointmentService {
             AppointmentStatus currentStatus,
             AppointmentStatus newStatus
     ) {
-        if (currentStatus == AppointmentStatus.CANCELLED) {
-            throw new IllegalStateException(
-                    "Lịch đã hủy không thể thay đổi trạng thái"
-            );
+        if (currentStatus == null || newStatus == null) {
+            throw new IllegalArgumentException("Trạng thái appointment không hợp lệ");
         }
 
-        if (currentStatus == AppointmentStatus.COMPLETED) {
-            throw new IllegalStateException(
-                    "Lịch đã hoàn thành không thể thay đổi trạng thái"
-            );
-        }
+        boolean validTransition = switch (currentStatus) {
 
-        if (currentStatus == AppointmentStatus.NO_SHOW) {
-            throw new IllegalStateException(
-                    "Lịch đã được đánh dấu không đến"
-            );
-        }
+            case PENDING_PAYMENT ->
+                    newStatus == AppointmentStatus.WAITING_CHECK_IN;
 
-        if (currentStatus == AppointmentStatus.PENDING_PAYMENT
-                && newStatus != AppointmentStatus.WAITING_CHECK_IN
-                && newStatus != AppointmentStatus.NO_SHOW) {
+            case WAITING_CHECK_IN ->
+                    newStatus == AppointmentStatus.WAITING_FOR_TURN
+                            || newStatus == AppointmentStatus.NO_SHOW;
+
+            case WAITING_FOR_TURN ->
+                    newStatus == AppointmentStatus.COMPLETED
+                            || newStatus == AppointmentStatus.NO_SHOW;
+
+            case CANCELLED, COMPLETED, NO_SHOW -> false;
+        };
+
+        if (!validTransition) {
             throw new IllegalArgumentException(
-                    "Lịch PENDING chỉ có thể chuyển thành "
-                            + "CONFIRMED hoặc NO_SHOW"
-            );
-        }
-
-        if (currentStatus == AppointmentStatus.WAITING_CHECK_IN
-                && newStatus != AppointmentStatus.COMPLETED
-                && newStatus != AppointmentStatus.NO_SHOW) {
-            throw new IllegalArgumentException(
-                    "Lịch CONFIRMED chỉ có thể chuyển thành "
-                            + "COMPLETED hoặc NO_SHOW"
+                    "Không thể chuyển trạng thái từ "
+                            + currentStatus
+                            + " sang "
+                            + newStatus
             );
         }
     }

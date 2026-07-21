@@ -17,6 +17,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // Check if a payment exists by appointment ID
     boolean existsByAppointmentId(Long appointmentId);
 
+    boolean existsByOrderCode(Long orderCode);
+
     // Find all payments by payment status, ordered by creation date in descending order
     List<Payment> findByPaymentStatusOrderByCreatedAtDesc(PaymentStatus paymentStatus);
 }
