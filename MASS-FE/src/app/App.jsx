@@ -41,7 +41,7 @@ function App() {
                 <Route path="/dashboard" element={<div>Welcome to Dashboard</div>} />
                 <Route path="/profile" element={<Profile />} />
               </Route>
-              
+
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
