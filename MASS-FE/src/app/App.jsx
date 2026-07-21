@@ -34,7 +34,9 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* Module Receptionist */}
-              <Route path="/appointments" element={<AppointmentListPage />} />
+              <Route element={<PrivateRoute allowedRoles={["ROLE_RECEPTIONIST"]} />}>
+                <Route path="/appointments" element={<AppointmentListPage />} />
+              </Route>
 
               {/* Protected routes example */}
               <Route element={<PrivateRoute allowedRoles={["ROLE_PATIENT", "ROLE_DOCTOR", "ROLE_RECEPTIONIST", "ROLE_ADMIN"]} />}>

@@ -11,5 +11,6 @@ public interface AuthService {
     AuthResponse getMe(String email);
     void generateAndSendOtp(String email);
     void verifyOtp(String email, String otp);
+    void verifyRegistrationOtp(String email, String otp);
     void resetPassword(String email, String otp, String newPassword);
 }

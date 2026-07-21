@@ -50,6 +50,10 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Column
+    @Builder.Default
+    private Boolean isVerified = false;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -77,6 +81,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        // Nếu isVerified null (tài khoản cũ) hoặc true thì cho phép login
+        return isVerified == null || isVerified;
     }
 }

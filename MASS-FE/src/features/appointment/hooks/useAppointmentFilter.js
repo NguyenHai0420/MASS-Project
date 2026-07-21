@@ -6,7 +6,7 @@ const initialState = {
   specialtyId: 'ALL',
   status: 'ALL',
   page: 0,
-  size: 10,
+  size: 6,
 };
 
 const appointmentReducer = (state, action) => {

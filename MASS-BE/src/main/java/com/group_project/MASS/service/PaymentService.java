@@ -6,4 +6,5 @@ public interface PaymentService {
     PaymentLinkResponse createPaymentLink(Long appointmentId);
 
     void handlePayOSWebhook(String webhookBody);
+    String checkPaymentStatus(Long appointmentId);
 }

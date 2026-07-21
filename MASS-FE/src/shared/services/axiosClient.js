@@ -8,6 +8,7 @@ const axiosClient = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 10000,
+  withCredentials: true,
 });
 
 // Request interceptor: tự động attach JWT token nếu có

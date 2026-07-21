@@ -41,6 +41,10 @@ const appointmentService = {
     });
   },
 
+  getById: async (appointmentId) => {
+    return axiosClient.get(`/api/receptionist/appointments/${appointmentId}`);
+  },
+
   // Cập nhật thông tin lịch hẹn
   update: async (appointmentId, data) => {
     return axiosClient.put(`/api/receptionist/appointments/${appointmentId}`, data);

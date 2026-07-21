@@ -35,7 +35,7 @@ public class AppointmentController {
             AppointmentStatus status,
             @RequestParam(defaultValue = "0")
             int page,
-            @RequestParam(defaultValue = "10")
+            @RequestParam(defaultValue = "6")
             int size
     ) {
         return ResponseEntity

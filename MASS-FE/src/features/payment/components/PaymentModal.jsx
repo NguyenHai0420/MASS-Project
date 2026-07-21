@@ -24,6 +24,29 @@ const PaymentModal = ({ show, onHide, appointment, onPaymentSuccess }) => {
     };
   }, [show, appointment]);
 
+  useEffect(() => {
+    let intervalId;
+    if (show && paymentData && appointment) {
+      intervalId = setInterval(async () => {
+        try {
+          const res = await paymentService.checkStatus(appointment.appointmentId);
+          if (res.data === 'WAITING_CHECK_IN' || res.data === 'WAITING_FOR_TURN' || res.data === 'COMPLETED') {
+            clearInterval(intervalId);
+            if (onPaymentSuccess) {
+              onPaymentSuccess();
+            }
+            onHide();
+          }
+        } catch (err) {
+          console.error("Error polling payment status", err);
+        }
+      }, 3000);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [show, paymentData, appointment, onHide, onPaymentSuccess]);
+
   const fetchPaymentLink = async () => {
     setLoading(true);
     setError('');
@@ -103,13 +126,13 @@ const PaymentModal = ({ show, onHide, appointment, onPaymentSuccess }) => {
             </p>
 
             {/* Số tiền */}
-            <div className="appt-payment-amount mb-3">200.000 VND</div>
+            <div className="appt-payment-amount mb-3">10000 VND</div>
 
             {/* QR Code */}
             {paymentData.qrCode && (
               <div className="appt-qr-wrapper mb-3">
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentData.checkoutUrl)}&size=220x220`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentData.qrCode)}&size=220x220`}
                   alt="QR Code thanh toán"
                   className="appt-qr-img"
                 />

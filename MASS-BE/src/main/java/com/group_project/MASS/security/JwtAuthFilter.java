@@ -46,6 +46,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private String parseJwtFromCookie(HttpServletRequest request) {
+
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {

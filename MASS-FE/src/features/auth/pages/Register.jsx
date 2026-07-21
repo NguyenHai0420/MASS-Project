@@ -14,7 +14,7 @@ const Register = () => {
     try {
       await authService.register(formData);
       setSuccess(true);
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => navigate(`/verify-otp?email=${formData.email}&type=register`), 2000);
     } catch (error) {
       setError("Registration failed. Email might already exist.");
     }
@@ -25,7 +25,7 @@ const Register = () => {
       <Card className="p-4 shadow-sm border rounded-4" style={{ width: "400px" }}>
         <h2 className="text-center mb-4">Register for MASS</h2>
         {error && <div className="alert alert-danger p-2 text-center">{error}</div>}
-        {success && <div className="alert alert-success p-2 text-center">Registration successful! Redirecting...</div>}
+        {success && <div className="alert alert-success p-2 text-center">Registration successful! Redirecting to OTP verification...</div>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Full Name</Form.Label>

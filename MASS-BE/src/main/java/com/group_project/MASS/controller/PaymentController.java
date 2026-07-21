@@ -25,6 +25,11 @@ public class PaymentController {
         );
     }
 
+    @GetMapping("/appointments/{appointmentId}/status")
+    public ResponseEntity<String> checkStatus(@PathVariable Long appointmentId) {
+        return ResponseEntity.ok(paymentService.checkPaymentStatus(appointmentId));
+    }
+
     @PostMapping("/payos/webhook")
     public ResponseEntity<ApiMessageResponse>
     handleWebhook(

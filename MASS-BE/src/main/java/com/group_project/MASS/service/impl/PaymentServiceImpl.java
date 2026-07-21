@@ -75,7 +75,7 @@ public class PaymentServiceImpl implements PaymentService{
          * Thay bằng giá khám thực tế của hệ thống.
          * Đổi giá trị sang BigDecimal vì entity dùng BigDecimal
          */
-        BigDecimal amount = BigDecimal.valueOf(200000);
+        BigDecimal amount = BigDecimal.valueOf(10000);
 
         Payment payment;
 
@@ -204,9 +204,11 @@ public class PaymentServiceImpl implements PaymentService{
                 LocalDateTime.now()
         );
 
-        appointment.setStatus(
-                AppointmentStatus.WAITING_CHECK_IN
-        );
+        if (appointment.getType() == AppointmentType.WALK_IN) {
+            appointment.setStatus(AppointmentStatus.WAITING_FOR_TURN);
+        } else {
+            appointment.setStatus(AppointmentStatus.WAITING_CHECK_IN);
+        }
 
         paymentRepository.save(payment);
         appointmentRepository.save(appointment);
@@ -237,5 +239,45 @@ public class PaymentServiceImpl implements PaymentService{
         );
 
         return orderCode;
+    }
+
+    @Override
+    public String checkPaymentStatus(Long appointmentId) {
+        Payment payment = paymentRepository
+                .findByAppointmentId(appointmentId)
+                .orElse(null);
+
+        if (payment == null) {
+            return "UNKNOWN";
+        }
+
+        if (payment.getPaymentStatus() == PaymentStatus.COMPLETED) {
+            return payment.getAppointment().getStatus().name();
+        }
+
+        try {
+            var data = payOS.paymentRequests().get(payment.getOrderCode());
+            if ("PAID".equals(data.getStatus().name())) {
+                payment.setPaymentStatus(PaymentStatus.COMPLETED);
+                payment.setPaymentDate(java.time.LocalDateTime.now());
+                
+                Appointment appointment = payment.getAppointment();
+                if (appointment.getType() == AppointmentType.WALK_IN) {
+                    appointment.setStatus(AppointmentStatus.WAITING_FOR_TURN);
+                } else {
+                    appointment.setStatus(AppointmentStatus.WAITING_CHECK_IN);
+                }
+                
+                paymentRepository.save(payment);
+                appointmentRepository.save(appointment);
+                
+                notificationService.createPaymentSuccessNotification(appointment, payment);
+                emailService.sendPaymentSuccessEmail(appointment, payment);
+                return appointment.getStatus().name();
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return "PENDING";
     }
 }
