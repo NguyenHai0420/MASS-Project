@@ -1,5 +1,7 @@
-package com.group_project.MASS.security;
+package com.group_project.MASS.config;
 
+import com.group_project.MASS.security.JwtAuthFilter;
+import com.group_project.MASS.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
