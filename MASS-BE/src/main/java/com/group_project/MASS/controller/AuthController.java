@@ -1,10 +1,9 @@
 package com.group_project.MASS.controller;
 
-import com.group_project.MASS.dto.LoginRequest;
-import com.group_project.MASS.dto.RegisterRequest;
+import com.group_project.MASS.dto.request.LoginRequest;
+import com.group_project.MASS.dto.request.RegisterRequest;
 import com.group_project.MASS.service.AuthService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +73,14 @@ public class AuthController {
         String otp = request.get("otp");
         authService.verifyOtp(email, otp);
         return ResponseEntity.ok(Map.of("message", "OTP verified successfully"));
+    }
+
+    @PostMapping("/verify-registration-otp")
+    public ResponseEntity<?> verifyRegistrationOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String otp = request.get("otp");
+        authService.verifyRegistrationOtp(email, otp);
+        return ResponseEntity.ok(Map.of("message", "Registration OTP verified successfully"));
     }
 
     @PostMapping("/reset-password")

@@ -1,31 +1,38 @@
-import axios from "axios";
+import axios from 'axios';
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = 'http://localhost:8080';
 
 const axiosClient = axios.create({
   baseURL: BASE_URL,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
-  withCredentials: true, // Send/receive the httpOnly accessToken cookie on every request
-  timeout: 10000, 
+  timeout: 10000,
+  withCredentials: true,
 });
 
-axiosClient.interceptors.response.use(
-  function (response) {
-    return response;
+// Request interceptor: tự động attach JWT token nếu có
+axiosClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
   },
-  async function (error) {
-    if (error.response && error.response.status === 401) {
-        console.error("Unauthorized! Session expired or invalid token.");
-        localStorage.removeItem("user");
+  (error) => Promise.reject(error),
+);
 
-        if (window.location.pathname !== "/login" && window.location.pathname !== "/register" && window.location.pathname !== "/forgot-password") {
-          window.location.href = "/login";
-        }
+// Response interceptor: xử lý lỗi chung
+axiosClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosClient;

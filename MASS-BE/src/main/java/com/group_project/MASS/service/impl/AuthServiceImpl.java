@@ -2,9 +2,9 @@ package com.group_project.MASS.service.impl;
 
 import com.group_project.MASS.service.AuthService;
 import com.group_project.MASS.service.EmailService;
-import com.group_project.MASS.dto.AuthResponse;
-import com.group_project.MASS.dto.LoginRequest;
-import com.group_project.MASS.dto.RegisterRequest;
+import com.group_project.MASS.dto.response.AuthResponse;
+import com.group_project.MASS.dto.request.LoginRequest;
+import com.group_project.MASS.dto.request.RegisterRequest;
 import com.group_project.MASS.model.PasswordResetToken;
 import com.group_project.MASS.model.Role;
 import com.group_project.MASS.model.User;
@@ -55,8 +55,18 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     public void register(RegisterRequest registerRequest) {
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Error: Email is already in use!");
+        Optional<User> existingUserOpt = userRepository.findByEmail(registerRequest.getEmail());
+        if (existingUserOpt.isPresent()) {
+            User existingUser = existingUserOpt.get();
+            if (existingUser.getIsVerified() != null && existingUser.getIsVerified()) {
+                throw new RuntimeException("Error: Email is already in use and verified!");
+            }
+            // Overwrite unverified user
+            existingUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+            existingUser.setFullName(registerRequest.getFullName());
+            userRepository.save(existingUser);
+            generateAndSendOtp(registerRequest.getEmail());
+            return;
         }
 
         User user = User.builder()
@@ -64,9 +74,20 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .fullName(registerRequest.getFullName())
                 .role(Role.ROLE_PATIENT) // Default role for open registration
+                .isVerified(false)
                 .build();
 
         userRepository.save(user);
+        generateAndSendOtp(registerRequest.getEmail());
+    }
+
+    @Transactional
+    public void verifyRegistrationOtp(String email, String otp) {
+        verifyOtp(email, otp);
+        User user = userRepository.findByEmail(email).get();
+        user.setIsVerified(true);
+        userRepository.save(user);
+        tokenRepository.deleteByUser(user);
     }
 
     public AuthResponse getMe(String email) {
