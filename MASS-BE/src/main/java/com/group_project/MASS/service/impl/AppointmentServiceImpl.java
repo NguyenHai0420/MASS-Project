@@ -221,6 +221,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                             .password(passwordEncoder.encode(request.getPatientPhone())) // Mật khẩu mặc định là SĐT
                             .dateOfBirth(request.getDateOfBirth())
                             .address(request.getAddress())
+                            .gender(request.getPatientGender())
                             .role(Role.ROLE_PATIENT)
                             .build();
                     return userRepository.save(newUser);
@@ -571,6 +572,12 @@ public class AppointmentServiceImpl implements AppointmentService {
                 == AppointmentStatus.NO_SHOW) {
             throw new IllegalStateException(
                     "Không thể hủy lịch đã được đánh dấu không đến"
+            );
+        }
+
+        if (appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
+            throw new IllegalStateException(
+                    "Không thể hủy lịch khám đã thanh toán"
             );
         }
 
@@ -1153,6 +1160,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         if (!appointment.getPatient().getEmail().equals(patientEmail)) {
             throw new RuntimeException("Not authorized to cancel this appointment");
+        }
+
+        if (appointment.getStatus() != com.group_project.MASS.model.AppointmentStatus.PENDING_PAYMENT) {
+            throw new RuntimeException("Không thể hủy lịch khám đã thanh toán");
         }
 
         appointment.setStatus(AppointmentStatus.CANCELLED);
