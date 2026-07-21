@@ -18,4 +18,5 @@ public class UserResponse {
     private String avatarUrl;
     private String address;
     private String role;   // "ROLE_ADMIN", "ROLE_DOCTOR", "ROLE_PATIENT"
+    private Boolean active;
 }

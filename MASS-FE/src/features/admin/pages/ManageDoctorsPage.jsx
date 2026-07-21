@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Container, Table, Button, Modal, Form } from "react-bootstrap";
+import { Container, Table, Button, Modal, Form, Badge } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
 import DashboardLayout from "../../../shared/components/DashboardLayout";
@@ -91,13 +91,23 @@ export default function ManageDoctorsPage() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Bạn có chắc muốn xoá bác sĩ này?")) return;
+        if (!window.confirm("Bạn có chắc muốn khóa bác sĩ này?")) return;
         try {
             await adminService.deleteDoctor(id);
-            toast.success("Xoá bác sĩ thành công!");
+            toast.success("Khóa bác sĩ thành công!");
             fetchData();
         } catch (error) {
-            toast.error("Xoá thất bại!");
+            toast.error("Khóa thất bại!");
+        }
+    };
+
+    const handleRestore = async (userId) => {
+        try {
+            await adminService.updateUser(userId, { active: true });
+            toast.success("Mở khóa bác sĩ thành công!");
+            fetchData();
+        } catch (error) {
+            toast.error("Có lỗi xảy ra!");
         }
     };
 
@@ -116,6 +126,7 @@ export default function ManageDoctorsPage() {
                             <th>Chuyên khoa</th>
                             <th>Bằng cấp</th>
                             <th>Kinh nghiệm</th>
+                            <th>Trạng thái</th>
                             <th>
                                 <Button variant="primary" size="sm" onClick={handleShowAdd}>
                                     + Thêm mới
@@ -133,6 +144,13 @@ export default function ManageDoctorsPage() {
                                 <td>{item.degree}</td>
                                 <td>{item.experience}</td>
                                 <td>
+                                    {item.active !== false ? (
+                                        <Badge bg="success">Hoạt động</Badge>
+                                    ) : (
+                                        <Badge bg="secondary">Đã khóa</Badge>
+                                    )}
+                                </td>
+                                <td>
                                     <Button
                                         variant="warning"
                                         size="sm"
@@ -141,13 +159,23 @@ export default function ManageDoctorsPage() {
                                     >
                                         Sửa
                                     </Button>
-                                    <Button
-                                        variant="danger"
-                                        size="sm"
-                                        onClick={() => handleDelete(item.id)}
-                                    >
-                                        Xoá
-                                    </Button>
+                                    {item.active !== false ? (
+                                        <Button
+                                            variant="danger"
+                                            size="sm"
+                                            onClick={() => handleDelete(item.id)}
+                                        >
+                                            Khóa
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="success"
+                                            size="sm"
+                                            onClick={() => handleRestore(item.userId)}
+                                        >
+                                            Mở khóa
+                                        </Button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

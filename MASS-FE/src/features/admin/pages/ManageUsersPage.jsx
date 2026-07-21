@@ -39,7 +39,10 @@ export default function ManageUsersPage() {
 
     const handleShowEdit = (item) => {
         setEditItem(item);
-        reset(item);
+        reset({
+            ...item,
+            active: item.active !== false ? "true" : "false"
+        });
         setShowModal(true);
     };
 
@@ -51,7 +54,11 @@ export default function ManageUsersPage() {
 
     const onSubmit = async (data) => {
         try {
-            await adminService.updateUser(editItem.id, data);
+            const payload = {
+                ...data,
+                active: data.active === "true" || data.active === true
+            };
+            await adminService.updateUser(editItem.id, payload);
             toast.success("Cập nhật người dùng thành công!");
             handleClose();
             fetchData();
@@ -61,13 +68,27 @@ export default function ManageUsersPage() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Bạn có chắc muốn xoá tài khoản này?")) return;
+        if (!window.confirm("Bạn có chắc muốn khóa tài khoản này?")) return;
         try {
             await adminService.deleteUser(id);
-            toast.success("Xoá tài khoản thành công!");
+            toast.success("Khóa tài khoản thành công!");
             fetchData();
         } catch (error) {
-            toast.error("Xoá thất bại!");
+            console.error(error);
+            const msg = error.response?.data?.message || error.message || "Khóa tài khoản thất bại!";
+            toast.error(msg);
+        }
+    };
+
+    const handleRestore = async (id) => {
+        try {
+            await adminService.updateUser(id, { active: true });
+            toast.success("Mở khóa tài khoản thành công!");
+            fetchData();
+        } catch (error) {
+            console.error(error);
+            const msg = error.response?.data?.message || error.message || "Có lỗi xảy ra!";
+            toast.error(msg);
         }
     };
 
@@ -85,6 +106,7 @@ export default function ManageUsersPage() {
                             <th>Email</th>
                             <th>Số điện thoại</th>
                             <th>Role</th>
+                            <th>Trạng thái</th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
@@ -101,6 +123,13 @@ export default function ManageUsersPage() {
                                     </Badge>
                                 </td>
                                 <td>
+                                    {item.active !== false ? (
+                                        <Badge bg="success">Hoạt động</Badge>
+                                    ) : (
+                                        <Badge bg="secondary">Đã khóa</Badge>
+                                    )}
+                                </td>
+                                <td>
                                     <Button
                                         variant="warning"
                                         size="sm"
@@ -109,13 +138,23 @@ export default function ManageUsersPage() {
                                     >
                                         Sửa
                                     </Button>
-                                    <Button
-                                        variant="danger"
-                                        size="sm"
-                                        onClick={() => handleDelete(item.id)}
-                                    >
-                                        Xoá
-                                    </Button>
+                                    {item.active !== false ? (
+                                        <Button
+                                            variant="danger"
+                                            size="sm"
+                                            onClick={() => handleDelete(item.id)}
+                                        >
+                                            Khóa
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="success"
+                                            size="sm"
+                                            onClick={() => handleRestore(item.id)}
+                                        >
+                                            Mở khóa
+                                        </Button>
+                                    )}
                                 </td>
                             </tr>
                         ))}
@@ -154,6 +193,14 @@ export default function ManageUsersPage() {
                                     <option value="ROLE_PATIENT">PATIENT</option>
                                     <option value="ROLE_DOCTOR">DOCTOR</option>
                                     <option value="ROLE_ADMIN">ADMIN</option>
+                                </Form.Select>
+                            </Form.Group>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label>Trạng thái</Form.Label>
+                                <Form.Select {...register("active")}>
+                                    <option value="true">Hoạt động</option>
+                                    <option value="false">Đã khóa</option>
                                 </Form.Select>
                             </Form.Group>
 

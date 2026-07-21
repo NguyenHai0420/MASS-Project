@@ -9,4 +9,5 @@ public class UserUpdateRequest {
     private String gender;
     private String address;
     private String role;   // admin có thể đổi role
+    private Boolean active;
 }

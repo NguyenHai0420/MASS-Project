@@ -24,4 +24,5 @@ public class DoctorResponse {
     private String degree;
     private String experience;
     private String description;
+    private Boolean active;
 }

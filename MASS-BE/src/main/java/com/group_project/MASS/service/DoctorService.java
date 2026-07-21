@@ -28,12 +28,18 @@ public class DoctorService {
             profiles = doctorProfileRepository.findAll();
         }
 
-        return profiles.stream().map(this::mapToDto).collect(Collectors.toList());
+        return profiles.stream()
+            .filter(p -> p.getUser() != null && Boolean.TRUE.equals(p.getUser().getActive()))
+            .map(this::mapToDto)
+            .collect(Collectors.toList());
     }
 
     public DoctorDto getDoctorById(Long id) {
         Optional<DoctorProfile> profileOpt = doctorProfileRepository.findById(id);
-        return profileOpt.map(this::mapToDto).orElse(null);
+        return profileOpt
+            .filter(profile -> profile.getUser() != null && Boolean.TRUE.equals(profile.getUser().getActive()))
+            .map(this::mapToDto)
+            .orElse(null);
     }
 
     private DoctorDto mapToDto(DoctorProfile profile) {

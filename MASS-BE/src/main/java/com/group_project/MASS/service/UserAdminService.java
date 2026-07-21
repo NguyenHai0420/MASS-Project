@@ -28,6 +28,7 @@ public class UserAdminService {
                 .avatarUrl(user.getAvatarUrl())
                 .address(user.getAddress())
                 .role(user.getRole().name())
+                .active(user.getActive())
                 .build();
     }
 
@@ -51,15 +52,17 @@ public class UserAdminService {
         if (request.getRole() != null) {
             user.setRole(Role.valueOf(request.getRole()));
         }
+        if (request.getActive() != null) {
+            user.setActive(request.getActive());
+        }
 
         return toResponse(userRepository.save(user));
     }
 
-    // Xóa user
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Không tìm thấy user với id: " + id);
-        }
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với id: " + id));
+        user.setActive(false);
+        userRepository.save(user);
     }
 }

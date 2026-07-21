@@ -46,6 +46,7 @@ public class DoctorProfileService {
                 .degree(dp.getDegree())
                 .experience(dp.getExperience())
                 .description(dp.getDescription())
+                .active(dp.getUser().getActive())
                 .build();
     }
 
@@ -111,12 +112,11 @@ public class DoctorProfileService {
         return toResponse(doctorProfileRepository.save(dp));
     }
 
-    // Xóa bác sĩ (xóa cả DoctorProfile và User)
     public void deleteDoctor(Long id) {
         DoctorProfile dp = doctorProfileRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bác sĩ với id: " + id));
-        Long userId = dp.getUser().getId();
-        doctorProfileRepository.deleteById(id);
-        userRepository.deleteById(userId);
+        User user = dp.getUser();
+        user.setActive(false);
+        userRepository.save(user);
     }
 }
