@@ -1109,17 +1109,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         DoctorProfile doctor = doctorProfileRepository.findById(request.getDoctorId())
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-        LocalDate requestDate = LocalDate.parse(request.getDate());
-        LocalTime requestTime = LocalTime.parse(request.getStartTime());
-        Schedule schedule = scheduleRepository.findByDoctorProfileIdAndDateAndStartTime(doctor.getId(), requestDate, requestTime)
-                .orElseGet(() -> Schedule.builder()
-                        .doctorProfile(doctor)
-                        .date(requestDate)
-                        .startTime(requestTime)
-                        .endTime(requestTime.plusMinutes(30))
-                        .isAvailable(true)
-                        .build());
-        schedule = scheduleRepository.save(schedule);
+        Schedule schedule = scheduleRepository.findById(request.getScheduleId())
+                .orElseThrow(() -> new RuntimeException("Schedule not found"));
 
         if (!schedule.isAvailable()) {
             throw new RuntimeException("Schedule is no longer available");
@@ -1185,19 +1176,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         Schedule oldSchedule = appointment.getSchedule();
         
-        LocalDate requestDate = LocalDate.parse(request.getDate());
-        LocalTime requestTime = LocalTime.parse(request.getStartTime());
-        
-        final DoctorProfile currentDoctor = appointment.getDoctorProfile();
-        Schedule newSchedule = scheduleRepository.findByDoctorProfileIdAndDateAndStartTime(currentDoctor.getId(), requestDate, requestTime)
-                .orElseGet(() -> Schedule.builder()
-                        .doctorProfile(currentDoctor)
-                        .date(requestDate)
-                        .startTime(requestTime)
-                        .endTime(requestTime.plusMinutes(30))
-                        .isAvailable(true)
-                        .build());
-        newSchedule = scheduleRepository.save(newSchedule);
+        Schedule newSchedule = scheduleRepository.findById(request.getScheduleId())
+                .orElseThrow(() -> new RuntimeException("New schedule not found"));
 
         if (!newSchedule.isAvailable()) {
             throw new RuntimeException("New schedule is not available");
