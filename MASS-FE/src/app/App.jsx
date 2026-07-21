@@ -1,4 +1,6 @@
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useNavigate } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "./providers/AuthProvider";
 import Login from "../features/auth/pages/Login";
 import Register from "../features/auth/pages/Register";
 import ForgotPassword from "../features/auth/pages/ForgotPassword";
@@ -14,7 +16,31 @@ import Navbar from "../shared/components/Navbar";
 import Footer from "../shared/components/Footer";
 import PrivateRoute from "./routes/PrivateRoute";
 import { AuthProvider } from "./providers/AuthProvider";
+import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
+import ManageDoctorsPage from "../features/admin/pages/ManageDoctorsPage";
+import ManageSpecialtiesPage from "../features/admin/pages/ManageSpecialtiesPage";
+import ManageUsersPage from "../features/admin/pages/ManageUsersPage";
+import ManageClinicPage from "../features/admin/pages/ManageClinicPage";
+import ManageStatisticsPage from "../features/admin/pages/ManageStatisticsPage";
+import DoctorDashboardPage from "../features/doctor/pages/DoctorDashboardPage";
+import WorkSchedulePage from "../features/doctor/pages/WorkSchedulePage";
+import AppointmentListPage from "../features/doctor/pages/AppointmentListPage";
+import MedicalRecordPage from "../features/doctor/pages/MedicalRecordPage";
 import "bootstrap/dist/css/bootstrap.min.css";
+
+
+// Redirect về đúng dashboard theo role sau khi login
+function DashboardRedirect() {
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!user) return;
+    if (user.role === "ROLE_ADMIN") navigate("/admin/dashboard", { replace: true });
+    else if (user.role === "ROLE_DOCTOR") navigate("/doctor/dashboard", { replace: true });
+    else navigate("/profile", { replace: true });
+  }, [user, navigate]);
+  return null;
+}
 
 function App() {
   return (
@@ -39,10 +65,28 @@ function App() {
 
               {/* Protected routes */}
               <Route element={<PrivateRoute allowedRoles={["ROLE_PATIENT", "ROLE_DOCTOR", "ROLE_RECEPTIONIST", "ROLE_ADMIN"]} />}>
-                <Route path="/dashboard" element={<div>Welcome to Dashboard</div>} />
+                <Route path="/dashboard" element={<DashboardRedirect />} />
                 <Route path="/profile" element={<Profile />} />
               </Route>
-              
+
+              {/* Admin routes */}
+              <Route element={<PrivateRoute allowedRoles={["ROLE_ADMIN"]} />}>
+                <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+                <Route path="/admin/doctors" element={<ManageDoctorsPage />} />
+                <Route path="/admin/specialties" element={<ManageSpecialtiesPage />} />
+                <Route path="/admin/users" element={<ManageUsersPage />} />
+                <Route path="/admin/clinic" element={<ManageClinicPage />} />
+                <Route path="/admin/statistics" element={<ManageStatisticsPage />} />
+              </Route>
+
+              {/* Doctor routes */}
+              <Route element={<PrivateRoute allowedRoles={["ROLE_DOCTOR"]} />}>
+                <Route path="/doctor/dashboard" element={<DoctorDashboardPage />} />
+                <Route path="/doctor/schedule" element={<WorkSchedulePage />} />
+                <Route path="/doctor/appointments" element={<AppointmentListPage />} />
+                <Route path="/doctor/medical-record" element={<MedicalRecordPage />} />
+              </Route>
+
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>

@@ -49,6 +49,12 @@ function Sidebar() {
                         <Nav.Link as={Link} to="/admin/users" className="text-white">
                             👥 Quản lý Người dùng
                         </Nav.Link>
+                        <Nav.Link as={Link} to="/admin/clinic" className="text-white">
+                            🏢 Quản lý Phòng khám
+                        </Nav.Link>
+                        <Nav.Link as={Link} to="/admin/statistics" className="text-white">
+                            📈 Thống kê báo cáo
+                        </Nav.Link>
                     </>
                 )}
 
