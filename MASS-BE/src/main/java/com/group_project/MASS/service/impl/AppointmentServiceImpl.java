@@ -68,6 +68,9 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new RuntimeException("Schedule is no longer available");
         }
       
+        schedule.setAvailable(false);
+        schedule = scheduleRepository.save(schedule);
+
         Appointment appointment = Appointment.builder()
                 .patient(patient)
                 .doctorProfile(doctor)
@@ -79,10 +82,6 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .build();
 
         appointment = appointmentRepository.save(appointment);
-
-      
-        schedule.setAvailable(false);
-        scheduleRepository.save(schedule);
 
         return mapToDto(appointment);
     }
@@ -144,16 +143,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         
+        newSchedule.setAvailable(false);
+        newSchedule = scheduleRepository.save(newSchedule);
+
         appointment.setSchedule(newSchedule);
         appointment = appointmentRepository.save(appointment);
-
        
         oldSchedule.setAvailable(true);
         scheduleRepository.save(oldSchedule);
-        
-        
-        newSchedule.setAvailable(false);
-        scheduleRepository.save(newSchedule);
 
         return mapToDto(appointment);
     }
