@@ -5,8 +5,11 @@ import patientService from '../../patient/services/patientService';
 
 const STATUS_MAPPING = {
   PENDING_PAYMENT: { text: "Chờ thanh toán", bg: "warning" },
-  PAID: { text: "Đã thanh toán", bg: "success" },
-  CANCELED: { text: "Đã hủy", bg: "danger" }
+  WAITING_CHECK_IN: { text: "Chờ check-in", bg: "info" },
+  WAITING_FOR_TURN: { text: "Chờ đến lượt", bg: "primary" },
+  CANCELLED: { text: "Đã hủy", bg: "danger" },
+  COMPLETED: { text: "Đã hoàn thành", bg: "success" },
+  NO_SHOW: { text: "Không đến", bg: "secondary" }
 };
 
 const MyAppointments = () => {
@@ -62,10 +65,12 @@ const MyAppointments = () => {
 
 
   const handleReschedule = (appt) => {
+    console.log("Dời lịch clicked for appt:", appt);
     if (appt.doctorId) {
+      console.log("Navigating to doctor:", appt.doctorId);
       navigate(`/doctors/${appt.doctorId}`, { state: { isReschedule: true, oldAppointmentId: appt.id } });
     } else {
-      // Fallback if doctorId is somehow missing
+      console.log("No doctorId found, navigating to /doctors");
       navigate('/doctors');
     }
   };
@@ -113,7 +118,7 @@ const MyAppointments = () => {
                               <Badge bg={statusInfo.bg}>{statusInfo.text}</Badge>
                             </td>
                             <td>
-                              {appt.status !== 'CANCELED' && (
+                              {!['CANCELLED', 'COMPLETED', 'NO_SHOW'].includes(appt.status) && (
                                 <div className="d-flex gap-2">
                                   <Button variant="outline-primary" size="sm" onClick={() => handleReschedule(appt)}>Dời lịch</Button>
                                   <Button variant="outline-danger" size="sm" onClick={() => handleCancelClick(appt)}>Hủy</Button>
@@ -132,7 +137,6 @@ const MyAppointments = () => {
         )}
       </Container>
 
-      {/* Cancel Confirmation Modal */}
       <Modal show={showCancelModal} onHide={() => !isProcessing && setShowCancelModal(false)} centered>
         <Modal.Header closeButton={!isProcessing}>
           <Modal.Title>Xác nhận hủy lịch</Modal.Title>

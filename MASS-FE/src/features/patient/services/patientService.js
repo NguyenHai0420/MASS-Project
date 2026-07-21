@@ -27,9 +27,9 @@ const patientService = {
     });
   },
 
-  // Appointments
+
   bookAppointment: (data) => {
-    // data should contain { doctorId, specialtyId, slotId/time, reason }
+
     return axiosClient.post('/api/appointments', data);
   },
 

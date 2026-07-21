@@ -18,4 +18,5 @@ public class ScheduleDto {
     private LocalTime startTime;
     private LocalTime endTime;
     private boolean isAvailable;
+    private int queueNumber;
 }
