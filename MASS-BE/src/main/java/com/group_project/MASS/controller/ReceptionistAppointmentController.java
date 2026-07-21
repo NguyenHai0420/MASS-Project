@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/receptionist/appointments")
 @RequiredArgsConstructor
-public class AppointmentController {
+public class ReceptionistAppointmentController {
     private final AppointmentService appointmentService;
 
     @GetMapping

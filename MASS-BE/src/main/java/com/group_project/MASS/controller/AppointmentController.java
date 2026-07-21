@@ -33,12 +33,12 @@ public class AppointmentController {
 
     @GetMapping("/my-appointments")
     public ResponseEntity<List<AppointmentDto>> getMyAppointments(Principal principal) {
-        return ResponseEntity.ok(appointmentService.getMyAppointments(getEmail(principal)));
+        return ResponseEntity.ok(appointmentService.getPatientAppointments(getEmail(principal)));
     }
 
     @PutMapping("/{id}/cancel")
     public ResponseEntity<AppointmentDto> cancelAppointment(@PathVariable Long id, Principal principal) {
-        return ResponseEntity.ok(appointmentService.cancelAppointment(id, getEmail(principal)));
+        return ResponseEntity.ok(appointmentService.cancelPatientAppointment(id, getEmail(principal)));
     }
 
     @PutMapping("/{id}/reschedule")
