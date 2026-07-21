@@ -65,7 +65,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .patient(patient)
                 .doctorProfile(doctor)
                 .schedule(schedule)
-                .status(AppointmentStatus.PENDING)
+                .status(AppointmentStatus.PENDING_PAYMENT)
                 .reason(request.getReason())
                 .type(AppointmentType.WALK_IN)
                 .createdAt(LocalDateTime.now())
@@ -153,6 +153,13 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .id(a.getId())
                 .doctorId(doctorId)
                 .doctorName(doctorName)
+                .date(a.getSchedule() != null ? a.getSchedule().getDate().toString() : "")
+                .time(a.getSchedule() != null ? a.getSchedule().getStartTime() + " - " + a.getSchedule().getEndTime() : "")
+                .specialty(specialtyName)
+                .status(a.getStatus().name())
+                .reason(a.getReason())
+                .build();
+    }
     @Override
     @Transactional(readOnly = true)
     public PageResponse<AppointmentListResponse> getAppointments(LocalDate date,
