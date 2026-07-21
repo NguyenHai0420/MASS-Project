@@ -44,14 +44,22 @@ const BaseProfileForm = () => {
     try {
       setSaving(true);
       setMessage({ type: "", text: "" });
-      const res = await profileService.updateProfile({
+      const payload = {
         fullName: profile.fullName,
         phone: profile.phone,
         address: profile.address,
         gender: profile.gender,
-        dateOfBirth: profile.dateOfBirth,
         avatarUrl: profile.avatarUrl
-      });
+      };
+      
+      // Handle empty date string causing backend parsing errors
+      if (profile.dateOfBirth && profile.dateOfBirth.trim() !== "") {
+        payload.dateOfBirth = profile.dateOfBirth;
+      } else {
+        payload.dateOfBirth = null;
+      }
+
+      const res = await profileService.updateProfile(payload);
       setProfile(res.data);
       setMessage({ type: "success", text: "Profile updated successfully!" });
       setIsEditMode(false);
