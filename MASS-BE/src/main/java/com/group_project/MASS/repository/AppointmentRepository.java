@@ -26,6 +26,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     // Đếm theo doctor (dùng cho dashboard)
     long countByDoctorProfile(DoctorProfile doctorProfile);
 
+    long countByDoctorProfileAndStatus(DoctorProfile doctorProfile, AppointmentStatus status);
+
     // Đếm tổng bệnh nhân (distinct)
     @Query("SELECT COUNT(DISTINCT a.patient.id) FROM Appointment a")
     long countDistinctPatients();

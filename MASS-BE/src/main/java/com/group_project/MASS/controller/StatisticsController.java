@@ -1,11 +1,16 @@
 package com.group_project.MASS.controller;
 
 import com.group_project.MASS.dto.DashboardStatsResponse;
+import com.group_project.MASS.dto.DoctorStatsResponse;
+import com.group_project.MASS.dto.PatientStatsResponse;
+import com.group_project.MASS.dto.SpecialtyStatsResponse;
 import com.group_project.MASS.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/statistics")
@@ -15,9 +20,23 @@ public class StatisticsController {
     @Autowired
     private StatisticsService statisticsService;
 
-    // GET /api/statistics/dashboard — Thống kê tổng quan cho Admin Dashboard
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardStatsResponse> getDashboardStats() {
         return ResponseEntity.ok(statisticsService.getDashboardStats());
+    }
+
+    @GetMapping("/doctors")
+    public ResponseEntity<List<DoctorStatsResponse>> getDoctorStats() {
+        return ResponseEntity.ok(statisticsService.getDoctorStats());
+    }
+
+    @GetMapping("/patients")
+    public ResponseEntity<PatientStatsResponse> getPatientStats() {
+        return ResponseEntity.ok(statisticsService.getPatientStats());
+    }
+
+    @GetMapping("/specialties")
+    public ResponseEntity<List<SpecialtyStatsResponse>> getSpecialtyStats() {
+        return ResponseEntity.ok(statisticsService.getSpecialtyStats());
     }
 }
