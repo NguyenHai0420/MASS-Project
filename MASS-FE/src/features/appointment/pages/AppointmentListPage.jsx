@@ -72,15 +72,15 @@ const AppointmentListPage = () => {
   // Client-side filter theo keyword (tìm theo tên/SĐT/email)
   const visibleAppointments = keyword.trim()
     ? appointments.filter((a) => {
-        const q = keyword.trim().toLowerCase();
-        return (
-          a.patientName?.toLowerCase().includes(q) ||
-          a.patientPhone?.toLowerCase().includes(q) ||
-          a.patientEmail?.toLowerCase().includes(q) ||
-          a.doctorName?.toLowerCase().includes(q) ||
-          String(a.appointmentId).includes(q)
-        );
-      })
+      const q = keyword.trim().toLowerCase();
+      return (
+        a.patientName?.toLowerCase().includes(q) ||
+        a.patientPhone?.toLowerCase().includes(q) ||
+        a.patientEmail?.toLowerCase().includes(q) ||
+        a.doctorName?.toLowerCase().includes(q) ||
+        String(a.appointmentId).includes(q)
+      );
+    })
     : appointments;
 
   // --- Modal handlers ---

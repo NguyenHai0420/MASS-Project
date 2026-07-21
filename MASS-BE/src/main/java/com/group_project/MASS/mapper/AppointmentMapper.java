@@ -66,6 +66,7 @@ public final class AppointmentMapper {
                 .doctorDegree(appointment.getDoctorProfile().getDegree())
                 .doctorExpertise(appointment.getDoctorProfile().getExperience())
                 .specialtyId(appointment.getDoctorProfile().getSpecialty().getId())
+                .specialtyName(appointment.getDoctorProfile().getSpecialty().getName())
                 .scheduleId(appointment.getSchedule().getId())
                 .appointmentDate(appointment.getSchedule().getDate())
                 .startTime(appointment.getSchedule().getStartTime())
