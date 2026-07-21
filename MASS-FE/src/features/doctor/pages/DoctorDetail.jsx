@@ -118,14 +118,13 @@ const DoctorDetail = () => {
                         <Alert variant="warning">Bác sĩ không có lịch làm việc trong ngày này.</Alert>
                       ) : (
                         <div className="d-flex flex-wrap gap-2 mt-1">
-                          {slots.map(slot => {
-                            const isBooked = !slot.available;
+                          {slots.map((slot, index) => {
                             return (
                               <div
-                                key={slot.id}
-                                className={`appt-slot-card ${isBooked ? 'opacity-50' : ''}`}
-                                style={{ pointerEvents: isBooked ? 'none' : 'auto', cursor: isBooked ? 'not-allowed' : 'pointer' }}
-                                onClick={() => handleSlotClick({...slot, isBooked})}
+                                key={slot.scheduleId || index}
+                                className={`appt-slot-card`}
+                                style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                                onClick={() => handleSlotClick({...slot, isBooked: false})}
                               >
                                 {slot.startTime}
                                 <br />

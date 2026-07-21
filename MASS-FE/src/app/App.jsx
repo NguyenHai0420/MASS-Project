@@ -53,11 +53,7 @@ function App() {
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Home />} />
-              <Route path="/book-appointment" element={<BookAppointment />} />
-              <Route path="/bookAppointment" element={<BookAppointment />} />
               <Route path="/doctors" element={<DoctorList />} />
-              <Route path="/doctors/:id" element={<DoctorDetail />} />
-              <Route path="/my-appointments" element={<MyAppointments />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -72,6 +68,9 @@ function App() {
 
               {/* Module Patient */}
               <Route element={<PrivateRoute allowedRoles={["ROLE_PATIENT"]} />}>
+                <Route path="/book-appointment" element={<BookAppointment />} />
+                <Route path="/bookAppointment" element={<BookAppointment />} />
+                <Route path="/doctors/:id" element={<DoctorDetail />} />
                 <Route path="/my-appointments" element={<MyAppointments />} />
               </Route>
 

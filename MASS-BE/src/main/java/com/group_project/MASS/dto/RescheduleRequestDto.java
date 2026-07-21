@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RescheduleRequestDto {
-    private Long scheduleId;
     private String date;
     private String startTime;
 }

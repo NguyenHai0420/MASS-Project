@@ -22,8 +22,8 @@ const patientService = {
 
   // Schedules
   getDoctorSchedules: (doctorId, date) => {
-    return axiosClient.get(`/api/schedules`, {
-      params: { doctorId, date }
+    return axiosClient.get(`/api/appointments/available-slots`, {
+      params: { doctorProfileId: doctorId, date }
     });
   },
 

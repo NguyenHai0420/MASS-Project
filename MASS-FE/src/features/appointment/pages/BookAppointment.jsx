@@ -24,13 +24,16 @@ const BookAppointment = () => {
     setBookingError(null);
     try {
       if (isReschedule && oldAppointmentId) {
-        await patientService.rescheduleAppointment(oldAppointmentId, { scheduleId: selectedSlot.id });
+        await patientService.rescheduleAppointment(oldAppointmentId, { 
+          date: selectedDate,
+          startTime: selectedSlot.startTime 
+        });
         navigate('/my-appointments', { state: { message: 'Dời lịch khám thành công!' } });
       } else {
         await patientService.bookAppointment({
           doctorId: doctor.id,
           date: selectedDate,
-          scheduleId: selectedSlot.id,
+          startTime: selectedSlot.startTime,
           reason: bookingReason
         });
         navigate('/my-appointments', { state: { message: 'Đặt lịch khám thành công!' } });

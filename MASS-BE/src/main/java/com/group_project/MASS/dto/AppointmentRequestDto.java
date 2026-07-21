@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class AppointmentRequestDto {
     private Long doctorId;
     private Long specialtyId; // Optional in backend if not strictly required, but matching frontend signature
-    private Long scheduleId;
     private String date;
     private String startTime;
     private String reason;

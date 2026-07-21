@@ -1109,8 +1109,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         DoctorProfile doctor = doctorProfileRepository.findById(request.getDoctorId())
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-        Schedule schedule = scheduleRepository.findById(request.getScheduleId())
-                .orElseThrow(() -> new RuntimeException("Schedule not found"));
+        LocalDate requestDate = LocalDate.parse(request.getDate());
+        LocalTime requestTime = LocalTime.parse(request.getStartTime());
+        Schedule schedule = getOrCreateSchedule(doctor, requestDate, requestTime);
 
         if (!schedule.isAvailable()) {
             throw new RuntimeException("Schedule is no longer available");
@@ -1176,8 +1177,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         Schedule oldSchedule = appointment.getSchedule();
         
-        Schedule newSchedule = scheduleRepository.findById(request.getScheduleId())
-                .orElseThrow(() -> new RuntimeException("New schedule not found"));
+        LocalDate requestDate = LocalDate.parse(request.getDate());
+        LocalTime requestTime = LocalTime.parse(request.getStartTime());
+        Schedule newSchedule = getOrCreateSchedule(appointment.getDoctorProfile(), requestDate, requestTime);
 
         if (!newSchedule.isAvailable()) {
             throw new RuntimeException("New schedule is not available");

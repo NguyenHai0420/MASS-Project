@@ -4,6 +4,7 @@ com\group_project\MASS\service\EmailService.class
 com\group_project\MASS\service\impl\UserServiceImpl.class
 com\group_project\MASS\dto\SpecialtyStatsResponse.class
 com\group_project\MASS\dto\ScheduleResponse$ScheduleResponseBuilder.class
+com\group_project\MASS\controller\ReceptionistAppointmentController.class
 com\group_project\MASS\dto\AppointmentResponse$AppointmentResponseBuilder.class
 com\group_project\MASS\dto\response\ErrorResponse$ErrorResponseBuilder.class
 com\group_project\MASS\model\PrescriptionItem$PrescriptionItemBuilder.class
@@ -149,7 +150,6 @@ com\group_project\MASS\service\EmailServiceImpl.class
 com\group_project\MASS\controller\DoctorAppointmentController.class
 com\group_project\MASS\dto\DoctorResponse$DoctorResponseBuilder.class
 com\group_project\MASS\controller\DoctorController.class
-com\group_project\MASS\controller\PatientAppointmentController.class
 com\group_project\MASS\dto\response\AuthResponse.class
 com\group_project\MASS\model\AppointmentType.class
 com\group_project\MASS\security\JwtAuthFilter.class

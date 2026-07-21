@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import org.springframework.format.annotation.DateTimeFormat;
+import com.group_project.MASS.dto.response.AvailableScheduleResponse;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -29,6 +33,16 @@ public class AppointmentController {
     @PostMapping
     public ResponseEntity<AppointmentDto> bookAppointment(@RequestBody AppointmentRequestDto request, Principal principal) {
         return ResponseEntity.ok(appointmentService.bookAppointment(request, getEmail(principal)));
+    }
+
+    @GetMapping("/available-slots")
+    public ResponseEntity<List<AvailableScheduleResponse>> getAvailableSlots(
+            @RequestParam(required = false) Long specialtyId,
+            @RequestParam(required = false) Long doctorProfileId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime fromTime
+    ) {
+        return ResponseEntity.ok(appointmentService.getAvailableSchedules(specialtyId, doctorProfileId, date, fromTime));
     }
 
     @GetMapping("/my-appointments")
