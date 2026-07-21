@@ -3,6 +3,7 @@ package com.group_project.MASS.service.impl;
 import com.group_project.MASS.dto.AppointmentDto;
 import com.group_project.MASS.dto.AppointmentRequestDto;
 import com.group_project.MASS.dto.RescheduleRequestDto;
+import com.group_project.MASS.service.AppointmentService;
 
 import com.group_project.MASS.dto.request.CancelAppointmentRequest;
 import com.group_project.MASS.dto.request.CreateWalkInAppointmentRequest;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -1070,7 +1072,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .specialtyName(dp.getSpecialty() != null ? dp.getSpecialty().getName() : null)
                 .build()
         ).toList();
-
+    }
 
     @Override
     public AppointmentDto bookAppointment(AppointmentRequestDto request, String patientEmail) {
@@ -1093,7 +1095,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .patient(patient)
                 .doctorProfile(doctor)
                 .schedule(schedule)
-                .status(AppointmentStatus.PENDING)
+                .status(AppointmentStatus.PENDING_PAYMENT)
                 .reason(request.getReason())
                 .type(AppointmentType.WALK_IN)
                 .createdAt(LocalDateTime.now())

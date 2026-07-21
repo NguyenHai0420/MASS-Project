@@ -75,13 +75,13 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "OTP verified successfully"));
     }
 
-    @PostMapping("/verify-registration-otp")
-    public ResponseEntity<?> verifyRegistrationOtp(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String otp = request.get("otp");
-        authService.verifyRegistrationOtp(email, otp);
-        return ResponseEntity.ok(Map.of("message", "Registration OTP verified successfully"));
-    }
+//    @PostMapping("/verify-registration-otp")
+//    public ResponseEntity<?> verifyRegistrationOtp(@RequestBody Map<String, String> request) {
+//        String email = request.get("email");
+//        String otp = request.get("otp");
+//        authService.verifyRegistrationOtp(email, otp);
+//        return ResponseEntity.ok(Map.of("message", "Registration OTP verified successfully"));
+//    }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
