@@ -1,5 +1,6 @@
 package com.group_project.MASS.service;
 
+import com.group_project.MASS.dto.AppointmentResponse;
 import com.group_project.MASS.dto.request.CancelAppointmentRequest;
 import com.group_project.MASS.dto.request.CreateWalkInAppointmentRequest;
 import com.group_project.MASS.dto.request.UpdateAppointmentRequest;
@@ -18,6 +19,8 @@ import java.util.List;
 public interface AppointmentService {
     List<Specialty> getAllSpecialties();
     List<DoctorResponse> getDoctorsBySpecialty(Long specialtyId);
+    // Lấy tất cả appointment của doctor đang đăng nhập
+    List<AppointmentResponse> getMyAppointments(String email);
     // Lấy danh sách các cuộc hẹn dựa trên ngày, chuyên khoa và trạng thái
     PageResponse<AppointmentListResponse> getAppointments(LocalDate date, Long specialtyId, AppointmentStatus status, int page, int size);
 
@@ -38,11 +41,14 @@ public interface AppointmentService {
 
     // Lấy danh sách các lịch trình có sẵn dựa trên chuyên khoa và ngày
     List<AvailableScheduleResponse> getAvailableSchedules(Long specialtyId, Long doctorProfileId, LocalDate date, LocalTime fromTime);
-
+    
     AppointmentDetailResponse checkInAppointment(Long appointmentId);
 
     AppointmentDto bookAppointment(AppointmentRequestDto request, String patientEmail);
-    List<AppointmentDto> getMyAppointments(String patientEmail);
-    AppointmentDto cancelAppointment(Long appointmentId, String patientEmail);
+    
+    List<AppointmentDto> getPatientAppointments(String patientEmail);
+    
+    AppointmentDto cancelPatientAppointment(Long appointmentId, String patientEmail);
+    
     AppointmentDto rescheduleAppointment(Long appointmentId, RescheduleRequestDto request, String patientEmail);
 }

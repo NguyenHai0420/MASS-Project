@@ -1,0 +1,8 @@
+export const ROLES = {
+    ADMIN: 'ROLE_ADMIN',
+    DOCTOR: 'ROLE_DOCTOR',
+    RECEPTIONIST: 'ROLE_RECEPTIONIST',
+    PATIENT: 'ROLE_PATIENT'
+};
+
+export default ROLES;

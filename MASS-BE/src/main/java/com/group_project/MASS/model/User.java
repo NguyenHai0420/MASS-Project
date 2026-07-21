@@ -54,6 +54,14 @@ public class User implements UserDetails {
     @Builder.Default
     private Boolean isVerified = false;
 
+    @Builder.Default
+    @Column(name = "active")
+    private Boolean active = true;
+
+    public Boolean getActive() {
+        return active != null ? active : true;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -81,7 +89,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        // Nếu isVerified null (tài khoản cũ) hoặc true thì cho phép login
-        return isVerified == null || isVerified;
+        // Nếu isVerified null (tài khoản cũ) hoặc true thì cho phép login, đồng thời tài khoản phải active
+        return (isVerified == null || isVerified) && getActive();
     }
 }

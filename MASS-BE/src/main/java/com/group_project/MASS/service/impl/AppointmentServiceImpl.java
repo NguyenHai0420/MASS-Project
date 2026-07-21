@@ -5,6 +5,7 @@ import com.group_project.MASS.dto.AppointmentRequestDto;
 import com.group_project.MASS.dto.RescheduleRequestDto;
 import com.group_project.MASS.service.AppointmentService;
 
+import com.group_project.MASS.dto.AppointmentResponse;
 import com.group_project.MASS.dto.request.CancelAppointmentRequest;
 import com.group_project.MASS.dto.request.CreateWalkInAppointmentRequest;
 import com.group_project.MASS.dto.request.UpdateAppointmentRequest;
@@ -44,6 +45,31 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final SpecialtyRepository specialtyRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private AppointmentResponse toResponse(Appointment a) {
+        return AppointmentResponse.builder()
+                .id(a.getId())
+                .patientName(a.getPatient().getFullName())
+                .patientEmail(a.getPatient().getEmail())
+                .reason(a.getReason())
+                .status(a.getStatus().name())
+                .scheduleDate(a.getSchedule().getDate())
+                .scheduleStartTime(a.getSchedule().getStartTime())
+                .scheduleEndTime(a.getSchedule().getEndTime())
+                .createdAt(a.getCreatedAt())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AppointmentResponse> getMyAppointments(String email) {
+        DoctorProfile dp = doctorProfileRepository.findByUserEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy DoctorProfile cho email: " + email));
+        return appointmentRepository.findByDoctorProfileOrderByCreatedAtDesc(dp)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 
 
     // Appointment List
@@ -1111,7 +1137,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public List<AppointmentDto> getMyAppointments(String patientEmail) {
+    public List<AppointmentDto> getPatientAppointments(String patientEmail) {
         User patient = userRepository.findByEmail(patientEmail)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
@@ -1120,7 +1146,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public AppointmentDto cancelAppointment(Long appointmentId, String patientEmail) {
+    public AppointmentDto cancelPatientAppointment(Long appointmentId, String patientEmail) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 

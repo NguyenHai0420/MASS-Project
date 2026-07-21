@@ -1,5 +1,6 @@
 package com.group_project.MASS.controller;
 
+
 import com.group_project.MASS.dto.request.CancelAppointmentRequest;
 import com.group_project.MASS.dto.request.CreateWalkInAppointmentRequest;
 import com.group_project.MASS.dto.request.UpdateAppointmentRequest;
@@ -141,5 +142,4 @@ public class AppointmentController {
         return ResponseEntity
                 .ok(appointmentService.cancelAppointment(appointmentId, request));
     }
-
 }

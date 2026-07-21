@@ -51,26 +51,68 @@ const AppointmentListPosting = ({
         </div>
       )}
 
-      {/* Appointment grid */}
+      {/* Appointment table */}
       {!isLoading && appointments.length > 0 && (
-        <Row className="g-4">
-          {appointments.map((appointment) => (
-            <Col lg={6} key={appointment.appointmentId}>
-              <AppointmentCard
-                appointment={appointment}
-                onViewDetail={onViewDetail}
-                onCheckIn={onCheckIn}
-                onPayment={onPayment}
-                onCancel={onCancel}
-              />
-            </Col>
-          ))}
-        </Row>
+        <div className="table-responsive">
+          <table className="table table-hover align-middle">
+            <thead className="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Bệnh nhân</th>
+                <th>Bác sĩ</th>
+                <th>Ngày</th>
+                <th>Giờ</th>
+                <th>Trạng thái</th>
+                <th className="text-end">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {appointments.map((appointment) => {
+                let badgeClass = 'bg-secondary';
+                let statusLabel = 'Không xác định';
+                switch (appointment.appointmentStatus) {
+                  case 'PENDING_PAYMENT': badgeClass = 'bg-warning text-dark'; statusLabel = 'Chờ thanh toán'; break;
+                  case 'WAITING_CHECK_IN': badgeClass = 'bg-primary'; statusLabel = 'Chờ check-in'; break;
+                  case 'WAITING_FOR_TURN': badgeClass = 'bg-info text-dark'; statusLabel = 'Chờ đến lượt'; break;
+                  case 'COMPLETED': badgeClass = 'bg-success'; statusLabel = 'Hoàn thành'; break;
+                  case 'CANCELLED': badgeClass = 'bg-danger'; statusLabel = 'Đã hủy'; break;
+                  case 'NO_SHOW': badgeClass = 'bg-dark'; statusLabel = 'Không đến khám'; break;
+                }
+
+                return (
+                  <tr key={appointment.appointmentId}>
+                    <td>#{appointment.appointmentId}</td>
+                    <td>
+                      <div className="fw-bold">{appointment.patientName}</div>
+                      <div className="text-muted small">{appointment.patientPhone}</div>
+                    </td>
+                    <td>{appointment.doctorName}</td>
+                    <td>{appointment.appointmentDate}</td>
+                    <td>{appointment.appointmentTime}</td>
+                    <td><span className={`badge ${badgeClass}`}>{statusLabel}</span></td>
+                    <td className="text-end">
+                      <button className="btn btn-sm btn-outline-primary me-2" onClick={() => onViewDetail?.(appointment)}>Chi tiết</button>
+                      {appointment.appointmentStatus === 'PENDING_PAYMENT' && (
+                        <button className="btn btn-sm btn-success me-2" onClick={() => onPayment?.(appointment)}>Thanh toán</button>
+                      )}
+                      {appointment.appointmentStatus === 'WAITING_CHECK_IN' && (
+                        <button className="btn btn-sm btn-info me-2" onClick={() => onCheckIn?.(appointment)}>Check-in</button>
+                      )}
+                      {(appointment.appointmentStatus === 'PENDING_PAYMENT' || appointment.appointmentStatus === 'WAITING_CHECK_IN') && (
+                        <button className="btn btn-sm btn-outline-danger" onClick={() => onCancel?.(appointment)}>Hủy</button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* Pagination */}
-      {!isLoading && totalPages > 1 && (
-        <div className="appt-pagination">
+      {!isLoading && totalPages > 0 && (
+        <div className="appt-pagination mt-4">
           <button
             className="appt-page-btn"
             onClick={() => onPageChange(currentPage - 1)}
@@ -92,7 +134,7 @@ const AppointmentListPosting = ({
           <button
             className="appt-page-btn"
             onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages - 1}
+            disabled={currentPage === totalPages - 1 || totalPages === 0}
           >
             ›
           </button>

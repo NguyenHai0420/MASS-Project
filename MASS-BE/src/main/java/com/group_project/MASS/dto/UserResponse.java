@@ -1,0 +1,22 @@
+package com.group_project.MASS.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserResponse {
+    private Long id;
+    private String fullName;
+    private String email;
+    private String phone;
+    private String gender;
+    private String avatarUrl;
+    private String address;
+    private String role;   // "ROLE_ADMIN", "ROLE_DOCTOR", "ROLE_PATIENT"
+    private Boolean active;
+}

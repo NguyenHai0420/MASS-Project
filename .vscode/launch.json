@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run MASS Backend",
+      "type": "java",
+      "request": "launch",
+      "mainClass": "com.group_project.MASS.MassApplication",
+      "cwd": "${workspaceFolder}/MASS-BE",
+      "projectName": "MASS",
+      "console": "integratedTerminal"
+    }
+  ]
+}

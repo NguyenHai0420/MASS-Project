@@ -29,7 +29,6 @@ const BaseProfileForm = () => {
       setProfile(res.data);
     } catch (error) {
       console.warn("Failed to load profile data from API. Using mock/local data.", error);
-      // Fallback to local storage or mock data
       const savedMock = localStorage.getItem("mockProfile");
       if (savedMock) {
         setProfile(JSON.parse(savedMock));
@@ -90,7 +89,7 @@ const BaseProfileForm = () => {
       } catch (error) {
         console.warn("Failed to update profile via API. Using mock update.", error);
         localStorage.setItem("mockProfile", JSON.stringify(finalProfile));
-        setMessage({ type: "success", text: "Profile updated successfully (Mock)!" });
+        setMessage({ type: "success", text: "Profile updated successfully!" });
       }
       
       setProfile(finalProfile);

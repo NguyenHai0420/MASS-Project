@@ -10,6 +10,8 @@ import java.util.Optional;
 @Repository
 
 public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
+    boolean existsByName(String name);
+
     // Find all specialties ordered by name in ascending order
     List<Specialty> findAllByOrderByNameAsc();
 
