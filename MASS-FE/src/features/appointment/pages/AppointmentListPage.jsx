@@ -113,6 +113,8 @@ const AppointmentListPage = () => {
     console.log('Walk-in tạo thành công:', newAppointment);
     fetchAppointments(); // Reload list
     setShowWalkIn(false);
+    setSelectedAppointment(newAppointment);
+    setShowPayment(true);
   };
 
   const handlePageChange = (newPage) => {

@@ -5,6 +5,12 @@ import axiosClient from "../../../shared/services/axiosClient";
 
 const doctorService = {
 
+    // ===== DOCTOR PROFILE =====
+    getMyDoctorProfile: async () => {
+        const response = await axiosClient.get("/api/doctors/profile/me");
+        return response.data;
+    },
+
     // ===== APPOINTMENTS =====
     getMyAppointments: async () => {
         const response = await axiosClient.get("/api/doctor/appointments");

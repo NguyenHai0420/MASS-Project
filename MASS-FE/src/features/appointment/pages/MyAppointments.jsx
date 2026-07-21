@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Card, Badge, Button, Spinner, Alert, Modal, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import patientService from '../../patient/services/patientService';
+import PaymentModal from '../../payment/components/PaymentModal';
 
 const STATUS_MAPPING = {
   PENDING_PAYMENT: { text: "Chờ thanh toán", bg: "warning" },
@@ -24,6 +25,9 @@ const MyAppointments = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedAppt, setSelectedAppt] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentAppt, setPaymentAppt] = useState(null);
 
   useEffect(() => {
     fetchAppointments();
@@ -75,6 +79,11 @@ const MyAppointments = () => {
     }
   };
 
+  const handlePaymentClick = (appt) => {
+    setPaymentAppt({ ...appt, appointmentId: appt.id });
+    setShowPaymentModal(true);
+  };
+
   return (
     <>
       <Container className="py-4">
@@ -120,8 +129,13 @@ const MyAppointments = () => {
                             <td>
                               {!['CANCELLED', 'COMPLETED', 'NO_SHOW'].includes(appt.status) && (
                                 <div className="d-flex gap-2">
+                                  {appt.status === 'PENDING_PAYMENT' && (
+                                    <Button variant="success" size="sm" onClick={() => handlePaymentClick(appt)}>Thanh toán</Button>
+                                  )}
                                   <Button variant="outline-primary" size="sm" onClick={() => handleReschedule(appt)}>Dời lịch</Button>
-                                  <Button variant="outline-danger" size="sm" onClick={() => handleCancelClick(appt)}>Hủy</Button>
+                                  {appt.status === 'PENDING_PAYMENT' && (
+                                    <Button variant="outline-danger" size="sm" onClick={() => handleCancelClick(appt)}>Hủy</Button>
+                                  )}
                                 </div>
                               )}
                             </td>
@@ -153,6 +167,16 @@ const MyAppointments = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <PaymentModal 
+        show={showPaymentModal}
+        onHide={() => setShowPaymentModal(false)}
+        appointment={paymentAppt}
+        onPaymentSuccess={() => {
+          setAlertMsg("Thanh toán thành công!");
+          fetchAppointments();
+        }}
+      />
     </>
   );
 };

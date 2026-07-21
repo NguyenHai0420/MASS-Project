@@ -5,19 +5,24 @@ import doctorService from "../../doctor/services/doctorService";
 
 const DoctorProfile = () => {
   const [schedules, setSchedules] = useState([]);
+  const [doctorInfo, setDoctorInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSchedules();
+    fetchData();
   }, []);
 
-  const fetchSchedules = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await doctorService.getMySchedules();
-      setSchedules(data || []);
+      const [schedData, profileData] = await Promise.all([
+        doctorService.getMySchedules(),
+        doctorService.getMyDoctorProfile().catch(() => null)
+      ]);
+      setSchedules(schedData || []);
+      setDoctorInfo(profileData || null);
     } catch (error) {
-      console.error("Lỗi tải lịch làm việc:", error);
+      console.error("Lỗi tải dữ liệu bác sĩ:", error);
     } finally {
       setLoading(false);
     }
@@ -37,9 +42,24 @@ const DoctorProfile = () => {
             <Card.Header className="bg-white border-0 pt-4 pb-0">
               <h4 className="fw-bold mb-0">Professional Info</h4>
             </Card.Header>
-            <Card.Body className="p-4 text-center text-muted">
-              <i className="bi bi-mortarboard mb-2" style={{ fontSize: "2rem" }}></i>
-              <p>Specialty, Experience, and Degree details will be managed here.</p>
+            <Card.Body className="p-4 text-start text-muted">
+              {doctorInfo ? (
+                <>
+                  <p className="mb-1 text-dark"><strong>Chuyên khoa: </strong> {doctorInfo.specialtyName}</p>
+                  <p className="mb-1 text-dark"><strong>Bằng cấp: </strong> {doctorInfo.degree}</p>
+                  <p className="mb-1 text-dark"><strong>Kinh nghiệm: </strong> {doctorInfo.experience}</p>
+                  {doctorInfo.description && (
+                    <p className="mb-1 text-dark">
+                      <strong>Giới thiệu: </strong> "{doctorInfo.description}"
+                    </p>
+                  )}
+                </>
+              ) : (
+                <div className="text-center">
+                  <i className="bi bi-mortarboard mb-2" style={{ fontSize: "2rem" }}></i>
+                  <p>Specialty, Experience, and Degree details will be managed here.</p>
+                </div>
+              )}
             </Card.Body>
           </Card>
 
