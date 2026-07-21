@@ -32,7 +32,7 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (specialtyRepository.count() == 0) {
-            // Seed Specialties
+            
             Specialty spec1 = Specialty.builder().name("Tim mạch").description("Khoa Tim mạch").build();
             Specialty spec2 = Specialty.builder().name("Nhi khoa").description("Khoa Nhi").build();
             Specialty spec3 = Specialty.builder().name("Nội khoa").description("Khoa Nội").build();
@@ -153,51 +153,6 @@ public class DataSeeder implements CommandLineRunner {
             }
             scheduleRepository.saveAll(newSchedules);
             System.out.println("✅ Data seeding for 5 new doctors completed!");
-        } else if (doctorProfileRepository.count() <= 7) {
-            System.out.println("⚠️ Found existing DB, but only 7 doctors. Seeding 5 more doctors with schedules until 30th...");
-
-            List<Specialty> allSpecialties = specialtyRepository.findAll();
-            Specialty spec8_s = allSpecialties.stream().filter(s -> s.getName().equals("Tim mạch")).findFirst().orElse(allSpecialties.get(0));
-            Specialty spec9_s = allSpecialties.stream().filter(s -> s.getName().equals("Nhi khoa")).findFirst().orElse(allSpecialties.get(0));
-            Specialty spec10_s = allSpecialties.stream().filter(s -> s.getName().equals("Răng Hàm Mặt")).findFirst().orElse(allSpecialties.get(0));
-            Specialty spec11_s = allSpecialties.stream().filter(s -> s.getName().equals("Da liễu")).findFirst().orElse(allSpecialties.get(0));
-            Specialty spec12_s = allSpecialties.stream().filter(s -> s.getName().equals("Mắt")).findFirst().orElse(allSpecialties.get(0));
-
-            User doc8 = User.builder().email("doctor8@mass.com").password(passwordEncoder.encode("123456")).fullName("Dr. Dinh Van H").role(Role.ROLE_DOCTOR).build();
-            User doc9 = User.builder().email("doctor9@mass.com").password(passwordEncoder.encode("123456")).fullName("Dr. Ly Thi I").role(Role.ROLE_DOCTOR).build();
-            User doc10 = User.builder().email("doctor10@mass.com").password(passwordEncoder.encode("123456")).fullName("Dr. Bui Van K").role(Role.ROLE_DOCTOR).build();
-            User doc11 = User.builder().email("doctor11@mass.com").password(passwordEncoder.encode("123456")).fullName("Dr. Do Thi L").role(Role.ROLE_DOCTOR).build();
-            User doc12 = User.builder().email("doctor12@mass.com").password(passwordEncoder.encode("123456")).fullName("Dr. Truong Van M").role(Role.ROLE_DOCTOR).build();
-            userRepository.saveAll(List.of(doc8, doc9, doc10, doc11, doc12));
-
-            DoctorProfile prof8 = DoctorProfile.builder().user(doc8).specialty(spec8_s).degree("Bác sĩ chuyên khoa I").experience("7 năm").build();
-            DoctorProfile prof9 = DoctorProfile.builder().user(doc9).specialty(spec9_s).degree("Thạc sĩ").experience("5 năm").build();
-            DoctorProfile prof10 = DoctorProfile.builder().user(doc10).specialty(spec10_s).degree("Tiến sĩ").experience("10 năm").build();
-            DoctorProfile prof11 = DoctorProfile.builder().user(doc11).specialty(spec11_s).degree("Thạc sĩ").experience("8 năm").build();
-            DoctorProfile prof12 = DoctorProfile.builder().user(doc12).specialty(spec12_s).degree("Bác sĩ chuyên khoa II").experience("14 năm").build();
-            doctorProfileRepository.saveAll(List.of(prof8, prof9, prof10, prof11, prof12));
-
-            LocalDate today = LocalDate.now();
-            LocalDate endDate = today.withDayOfMonth(30);
-            if (endDate.isBefore(today)) {
-                endDate = today.plusDays(5);
-            }
-
-            List<DoctorProfile> newProfiles2 = List.of(prof8, prof9, prof10, prof11, prof12);
-            java.util.ArrayList<Schedule> newSchedules2 = new java.util.ArrayList<>();
-            
-            for (DoctorProfile prof : newProfiles2) {
-                LocalDate currentDate = today;
-                while (!currentDate.isAfter(endDate)) {
-                    newSchedules2.add(Schedule.builder().doctorProfile(prof).date(currentDate).startTime(LocalTime.of(8, 0)).endTime(LocalTime.of(8, 30)).isAvailable(true).build());
-                    newSchedules2.add(Schedule.builder().doctorProfile(prof).date(currentDate).startTime(LocalTime.of(9, 0)).endTime(LocalTime.of(9, 30)).isAvailable(true).build());
-                    newSchedules2.add(Schedule.builder().doctorProfile(prof).date(currentDate).startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(10, 30)).isAvailable(true).build());
-                    newSchedules2.add(Schedule.builder().doctorProfile(prof).date(currentDate).startTime(LocalTime.of(14, 0)).endTime(LocalTime.of(14, 30)).isAvailable(true).build());
-                    currentDate = currentDate.plusDays(1);
-                }
-            }
-            scheduleRepository.saveAll(newSchedules2);
-            System.out.println("✅ Data seeding for 5 MORE doctors (to 30th) completed!");
         }
     }
 }

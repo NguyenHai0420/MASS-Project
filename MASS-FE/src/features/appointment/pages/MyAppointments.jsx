@@ -4,9 +4,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import patientService from '../../patient/services/patientService';
 
 const STATUS_MAPPING = {
-  PENDING_PAYMENT: { text: "Chờ thanh toán", bg: "warning" },
-  PAID: { text: "Đã thanh toán", bg: "success" },
-  CANCELED: { text: "Đã hủy", bg: "danger" }
+  PENDING: { text: "Chờ xác nhận", bg: "warning" },
+  CONFIRMED: { text: "Đã xác nhận", bg: "primary" },
+  CANCELLED: { text: "Đã hủy", bg: "danger" },
+  COMPLETED: { text: "Đã hoàn thành", bg: "success" },
+  NO_SHOW: { text: "Không đến", bg: "secondary" }
 };
 
 const MyAppointments = () => {
@@ -113,7 +115,7 @@ const MyAppointments = () => {
                               <Badge bg={statusInfo.bg}>{statusInfo.text}</Badge>
                             </td>
                             <td>
-                              {appt.status !== 'CANCELED' && (
+                              {(appt.status === 'PENDING' || appt.status === 'CONFIRMED') && (
                                 <div className="d-flex gap-2">
                                   <Button variant="outline-primary" size="sm" onClick={() => handleReschedule(appt)}>Dời lịch</Button>
                                   <Button variant="outline-danger" size="sm" onClick={() => handleCancelClick(appt)}>Hủy</Button>

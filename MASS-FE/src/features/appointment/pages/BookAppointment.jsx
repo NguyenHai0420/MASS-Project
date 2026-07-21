@@ -7,9 +7,9 @@ import patientService from "../../patient/services/patientService";
 const BookAppointment = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   const { doctor, selectedDate, selectedSlot, isReschedule, oldAppointmentId } = location.state || {};
-  
+
   const [bookingReason, setBookingReason] = useState('');
   const [isBooking, setIsBooking] = useState(false);
   const [bookingError, setBookingError] = useState(null);
@@ -20,7 +20,7 @@ const BookAppointment = () => {
       setBookingError('Vui lòng nhập lý do khám bệnh');
       return;
     }
-    
+
     setIsBooking(true);
     setBookingError(null);
     try {
@@ -38,7 +38,7 @@ const BookAppointment = () => {
       }
     } catch (err) {
       console.error("Booking/Reschedule failed", err);
-      // Mock success for testing
+
       navigate('/my-appointments', { state: { message: isReschedule ? 'Dời lịch khám thành công (Mock)!' : 'Đặt lịch khám thành công (Mock)!' } });
     } finally {
       setIsBooking(false);
@@ -57,7 +57,7 @@ const BookAppointment = () => {
   return (
     <Container className="py-5">
       <h2 className="fw-bold mb-4 text-center">{isReschedule ? 'Reschedule Appointment' : 'Book an Appointment'}</h2>
-      
+
       <Card className="shadow-sm mx-auto" style={{ maxWidth: '600px' }}>
         <Card.Header className="bg-primary text-white">
           <h4 className="mb-0">{isReschedule ? 'Xác nhận dời lịch khám' : 'Xác nhận đặt lịch khám'}</h4>
@@ -70,14 +70,14 @@ const BookAppointment = () => {
             <p className="mb-1"><strong>Ngày khám:</strong> {selectedDate}</p>
             <p className="mb-0"><strong>Thời gian:</strong> {selectedSlot?.startTime} - {selectedSlot?.endTime}</p>
           </div>
-          
+
           <Form onSubmit={handleBookAppointment}>
             {!isReschedule && (
               <Form.Group className="mb-4">
                 <Form.Label className="fw-bold">Lý do khám bệnh <span className="text-danger">*</span></Form.Label>
-                <Form.Control 
-                  as="textarea" 
-                  rows={3} 
+                <Form.Control
+                  as="textarea"
+                  rows={3}
                   placeholder="Triệu chứng, vấn đề cần tư vấn..."
                   value={bookingReason}
                   onChange={(e) => setBookingReason(e.target.value)}
@@ -85,7 +85,7 @@ const BookAppointment = () => {
                 />
               </Form.Group>
             )}
-            
+
             <div className="d-flex justify-content-end gap-2">
               <Button variant="secondary" onClick={() => navigate(-1)} disabled={isBooking}>
                 Hủy
