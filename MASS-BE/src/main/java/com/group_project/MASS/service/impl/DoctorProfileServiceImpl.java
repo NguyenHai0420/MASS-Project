@@ -1,7 +1,7 @@
 package com.group_project.MASS.service.impl;
 
-import com.group_project.MASS.dto.DoctorRequest;
-import com.group_project.MASS.dto.DoctorResponse;
+import com.group_project.MASS.dto.request.DoctorRequest;
+import com.group_project.MASS.dto.response.DoctorProfileResponse;
 import com.group_project.MASS.model.DoctorProfile;
 import com.group_project.MASS.model.Role;
 import com.group_project.MASS.model.Specialty;
@@ -32,8 +32,8 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private DoctorResponse toResponse(DoctorProfile dp) {
-        return DoctorResponse.builder()
+    private DoctorProfileResponse toResponse(DoctorProfile dp) {
+        return DoctorProfileResponse.builder()
                 .id(dp.getId())
                 .userId(dp.getUser().getId())
                 .fullName(dp.getUser().getFullName())
@@ -51,7 +51,7 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
     }
 
     @Override
-    public List<DoctorResponse> getAllDoctors() {
+    public List<DoctorProfileResponse> getAllDoctors() {
         return doctorProfileRepository.findAll()
                 .stream()
                 .map(this::toResponse)
@@ -59,7 +59,7 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
     }
 
     @Override
-    public DoctorResponse createDoctor(DoctorRequest request) {
+    public DoctorProfileResponse createDoctor(DoctorRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email '" + request.getEmail() + "' đã được sử dụng");
         }
@@ -88,7 +88,7 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
     }
 
     @Override
-    public DoctorResponse updateDoctor(Long id, DoctorRequest request) {
+    public DoctorProfileResponse updateDoctor(Long id, DoctorRequest request) {
         DoctorProfile dp = doctorProfileRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bác sĩ với id: " + id));
 

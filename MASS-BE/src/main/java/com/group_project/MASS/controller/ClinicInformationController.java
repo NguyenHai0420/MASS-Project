@@ -1,7 +1,7 @@
 package com.group_project.MASS.controller;
 
-import com.group_project.MASS.dto.ClinicInformationRequest;
-import com.group_project.MASS.dto.ClinicInformationResponse;
+import com.group_project.MASS.dto.request.ClinicInformationRequest;
+import com.group_project.MASS.dto.response.ClinicInformationResponse;
 import com.group_project.MASS.service.ClinicInformationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

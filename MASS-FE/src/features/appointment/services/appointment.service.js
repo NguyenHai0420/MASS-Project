@@ -13,7 +13,6 @@ const appointmentService = {
 
   // Lấy danh sách slot trống (để điền form walk-in)
   getAvailableSchedules: async (params = {}) => {
-    // Lưu ý: typo từ backend – "scheduels"
     return axiosClient.get('/api/receptionist/appointments/available-scheduels', { params });
   },
 

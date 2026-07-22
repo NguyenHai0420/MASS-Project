@@ -1,7 +1,7 @@
 package com.group_project.MASS.service.impl;
 
-import com.group_project.MASS.dto.UserResponse;
-import com.group_project.MASS.dto.UserUpdateRequest;
+import com.group_project.MASS.dto.response.UserResponse;
+import com.group_project.MASS.dto.request.UserUpdateRequest;
 import com.group_project.MASS.model.Role;
 import com.group_project.MASS.model.User;
 import com.group_project.MASS.repository.UserRepository;

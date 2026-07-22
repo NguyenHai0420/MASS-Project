@@ -1,6 +1,6 @@
 package com.group_project.MASS.controller;
 
-import com.group_project.MASS.dto.UpdateProfileRequest;
+import com.group_project.MASS.dto.request.UpdateProfileRequest;
 import com.group_project.MASS.dto.UserProfileDto;
 import com.group_project.MASS.service.UserService;
 import jakarta.validation.Valid;

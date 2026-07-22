@@ -1,7 +1,7 @@
 package com.group_project.MASS.service;
 
-import com.group_project.MASS.dto.MedicalRecordRequest;
-import com.group_project.MASS.dto.MedicalRecordResponse;
+import com.group_project.MASS.dto.request.MedicalRecordRequest;
+import com.group_project.MASS.dto.response.MedicalRecordResponse;
 
 public interface MedicalRecordService {
     MedicalRecordResponse getByAppointmentId(Long appointmentId);

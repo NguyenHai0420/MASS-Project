@@ -1,6 +1,6 @@
 package com.group_project.MASS.service;
 
-import com.group_project.MASS.dto.UpdateProfileRequest;
+import com.group_project.MASS.dto.request.UpdateProfileRequest;
 import com.group_project.MASS.dto.UserProfileDto;
 
 public interface UserService {

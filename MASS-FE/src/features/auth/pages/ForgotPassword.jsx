@@ -16,7 +16,11 @@ const ForgotPassword = () => {
       setMessage("OTP sent to your email!");
       setTimeout(() => navigate(`/verify-otp?email=${email}`), 2000);
     } catch (error) {
-      setError("User not found or error occurred.");
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("User not found or error occurred.");
+      }
     }
   };
 

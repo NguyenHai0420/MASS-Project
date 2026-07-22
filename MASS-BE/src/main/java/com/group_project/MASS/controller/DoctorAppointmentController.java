@@ -1,6 +1,6 @@
 package com.group_project.MASS.controller;
 
-import com.group_project.MASS.dto.AppointmentResponse;
+import com.group_project.MASS.dto.response.AppointmentResponse;
 import com.group_project.MASS.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

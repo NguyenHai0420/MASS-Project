@@ -1,7 +1,7 @@
 package com.group_project.MASS.service.impl;
 
-import com.group_project.MASS.dto.ClinicInformationRequest;
-import com.group_project.MASS.dto.ClinicInformationResponse;
+import com.group_project.MASS.dto.request.ClinicInformationRequest;
+import com.group_project.MASS.dto.response.ClinicInformationResponse;
 import com.group_project.MASS.model.ClinicInformation;
 import com.group_project.MASS.repository.ClinicInformationRepository;
 import com.group_project.MASS.service.ClinicInformationService;

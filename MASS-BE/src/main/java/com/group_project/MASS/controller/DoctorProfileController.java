@@ -1,7 +1,7 @@
 package com.group_project.MASS.controller;
 
-import com.group_project.MASS.dto.DoctorRequest;
-import com.group_project.MASS.dto.DoctorResponse;
+import com.group_project.MASS.dto.request.DoctorRequest;
+import com.group_project.MASS.dto.response.DoctorProfileResponse;
 import com.group_project.MASS.service.DoctorProfileService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,21 +20,21 @@ public class DoctorProfileController {
 
     // GET /api/doctors — Ai cũng xem được
     @GetMapping
-    public ResponseEntity<List<DoctorResponse>> getAllDoctors() {
+    public ResponseEntity<List<DoctorProfileResponse>> getAllDoctors() {
         return ResponseEntity.ok(doctorProfileService.getAllDoctors());
     }
 
     // POST /api/doctors — Chỉ ADMIN
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<DoctorResponse> createDoctor(@Valid @RequestBody DoctorRequest request) {
+    public ResponseEntity<DoctorProfileResponse> createDoctor(@Valid @RequestBody DoctorRequest request) {
         return ResponseEntity.ok(doctorProfileService.createDoctor(request));
     }
 
     // PUT /api/doctors/{id} — Chỉ ADMIN (id là DoctorProfile id)
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<DoctorResponse> updateDoctor(
+    public ResponseEntity<DoctorProfileResponse> updateDoctor(
             @PathVariable Long id,
             @Valid @RequestBody DoctorRequest request) {
         return ResponseEntity.ok(doctorProfileService.updateDoctor(id, request));

@@ -1,9 +1,9 @@
 package com.group_project.MASS.controller;
 
-import com.group_project.MASS.dto.DashboardStatsResponse;
-import com.group_project.MASS.dto.DoctorStatsResponse;
-import com.group_project.MASS.dto.PatientStatsResponse;
-import com.group_project.MASS.dto.SpecialtyStatsResponse;
+import com.group_project.MASS.dto.response.DashboardStatsResponse;
+import com.group_project.MASS.dto.response.DoctorStatsResponse;
+import com.group_project.MASS.dto.response.PatientStatsResponse;
+import com.group_project.MASS.dto.response.SpecialtyStatsResponse;
 import com.group_project.MASS.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
