@@ -22,14 +22,14 @@ const patientService = {
 
   // Schedules
   getDoctorSchedules: (doctorId, date) => {
-    return axiosClient.get(`/api/schedules`, {
-      params: { doctorId, date }
+    return axiosClient.get(`/api/appointments/available-slots`, {
+      params: { doctorProfileId: doctorId, date }
     });
   },
 
-  // Appointments
+
   bookAppointment: (data) => {
-    // data should contain { doctorId, specialtyId, slotId/time, reason }
+
     return axiosClient.post('/api/appointments', data);
   },
 

@@ -1,5 +1,8 @@
 package com.group_project.MASS.controller;
 
+import com.group_project.MASS.dto.AppointmentDto;
+import com.group_project.MASS.dto.request.AppointmentRequestDto;
+import com.group_project.MASS.dto.request.RescheduleRequestDto;
 import com.group_project.MASS.dto.request.CancelAppointmentRequest;
 import com.group_project.MASS.dto.request.CreateWalkInAppointmentRequest;
 import com.group_project.MASS.dto.request.UpdateAppointmentRequest;
@@ -7,190 +10,62 @@ import com.group_project.MASS.dto.request.UpdateAppointmentStatusRequest;
 import com.group_project.MASS.dto.response.*;
 import com.group_project.MASS.model.AppointmentStatus;
 import com.group_project.MASS.service.AppointmentService;
-import com.group_project.MASS.model.Specialty;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
+import com.group_project.MASS.dto.response.AvailableScheduleResponse;
 
 @RestController
-@RequestMapping("/api/receptionist/appointments")
-@RequiredArgsConstructor
+@RequestMapping("/api/appointments")
 public class AppointmentController {
-    private final AppointmentService appointmentService;
 
-    @GetMapping
-    public ResponseEntity<PageResponse<AppointmentListResponse>> getAppointments(
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate date,
-            @RequestParam(required = false)
-            Long specialtyId,
-            @RequestParam(required = false)
-            AppointmentStatus status,
-            @RequestParam(defaultValue = "0")
-            int page,
-            @RequestParam(defaultValue = "6")
-            int size
-    ) {
-        return ResponseEntity
-                .ok(appointmentService.getAppointments(
-                        date,
-                        specialtyId,
-                        status,
-                        page,
-                        size));
+    @Autowired
+    private AppointmentService appointmentService;
+
+    private String getEmail(Principal principal) {
+        if (principal == null) {
+            // Fallback for testing if security is not fully enforced
+            return "patient@test.com"; 
+        }
+        return principal.getName();
     }
 
-    @GetMapping("/{appointmentId}")
-    public ResponseEntity<AppointmentDetailResponse> getAppointmentDetail(
-            @PathVariable Long appointmentId
-    ) {
-        return ResponseEntity
-                .ok(appointmentService.getAppointmentDetail(appointmentId));
+    @PostMapping
+    public ResponseEntity<AppointmentDto> bookAppointment(@RequestBody AppointmentRequestDto request, Principal principal) {
+        return ResponseEntity.ok(appointmentService.bookAppointment(request, getEmail(principal)));
     }
 
-    @GetMapping("/available-scheduels")
-    public ResponseEntity<List<AvailableScheduleResponse>> getAvailableSheduels(
-            @RequestParam(required = false)
-            Long specialtyId,
-            @RequestParam(required = false)
-            Long doctorProfileId,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate date,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-            LocalTime fromTime
+    @GetMapping("/available-slots")
+    public ResponseEntity<List<AvailableScheduleResponse>> getAvailableSlots(
+            @RequestParam(required = false) Long specialtyId,
+            @RequestParam(required = false) Long doctorProfileId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime fromTime
     ) {
-        return ResponseEntity
-                .ok(appointmentService.getAvailableSchedules(specialtyId, doctorProfileId, date, fromTime));
+        return ResponseEntity.ok(appointmentService.getAvailableSchedules(specialtyId, doctorProfileId, date, fromTime));
     }
 
-    @GetMapping("/doctors")
-    public ResponseEntity<List<DoctorResponse>> getDoctorsBySpecialty(
-            @RequestParam Long specialtyId
-    ) {
-        return ResponseEntity.ok(appointmentService.getDoctorsBySpecialty(specialtyId));
+    @GetMapping("/my-appointments")
+    public ResponseEntity<List<AppointmentDto>> getMyAppointments(Principal principal) {
+        return ResponseEntity.ok(appointmentService.getPatientAppointments(getEmail(principal)));
     }
 
-    @GetMapping("/specialties")
-    public ResponseEntity<List<Specialty>> getAllSpecialties() {
-        return ResponseEntity.ok(appointmentService.getAllSpecialties());
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<AppointmentDto> cancelAppointment(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(appointmentService.cancelPatientAppointment(id, getEmail(principal)));
     }
 
-    @PostMapping("/walk-in")
-    public ResponseEntity<AppointmentDetailResponse> createWalkInAppointment(
-            @Valid
-            @RequestBody
-            CreateWalkInAppointmentRequest request
-    ) {
-        return ResponseEntity
-                .ok(appointmentService.createWalkInAppointment(request));
-    }
-
-    @PatchMapping("/{appointmentId}/check-in")
-    public ResponseEntity<AppointmentDetailResponse>
-    checkInAppointment(
-            @PathVariable Long appointmentId
-    ) {
-        return ResponseEntity.ok(
-                appointmentService.checkInAppointment(
-                        appointmentId
-                )
-        );
-    }
-
-    @PutMapping("/{appointmentId}")
-    public ResponseEntity<AppointmentDetailResponse> updateAppointment(
-            @PathVariable
-            Long appointmentId,
-            @Valid
-            @RequestBody
-            UpdateAppointmentRequest request
-    ) {
-        return ResponseEntity
-                .ok(appointmentService.updateAppointment(appointmentId, request));
-    }
-
-    @PatchMapping("/{appointmentId}/status")
-    public ResponseEntity<ApiMessageResponse> updateAppointmentStatus(
-            @PathVariable
-            Long appointmentId,
-            @Valid
-            @RequestBody
-            UpdateAppointmentStatusRequest request
-    ) {
-        return ResponseEntity
-                .ok(appointmentService.updateAppointmentStatus(appointmentId, request));
-    }
-
-    @PatchMapping("/{appointmentId}/cancel")
-    public ResponseEntity<ApiMessageResponse> cancelAppointment(
-            @PathVariable
-            Long appointmentId,
-            @Valid
-            @RequestBody
-            CancelAppointmentRequest request
-    ) {
-        return ResponseEntity
-                .ok(appointmentService.cancelAppointment(appointmentId, request));
+    @PutMapping("/{id}/reschedule")
+    public ResponseEntity<AppointmentDto> rescheduleAppointment(
+            @PathVariable Long id,
+            @RequestBody RescheduleRequestDto request,
+            Principal principal) {
+        return ResponseEntity.ok(appointmentService.rescheduleAppointment(id, request, getEmail(principal)));
     }
 }
-
-//=======
-//import com.group_project.MASS.dto.AppointmentDto;
-//import com.group_project.MASS.dto.AppointmentRequestDto;
-//import com.group_project.MASS.dto.RescheduleRequestDto;
-//import com.group_project.MASS.service.AppointmentService;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.security.Principal;
-//import java.util.List;
-//
-//@RestController
-//@RequestMapping("/api/appointments")
-//public class AppointmentController {
-//
-//    @Autowired
-//    private AppointmentService appointmentService;
-//
-//    private String getEmail(Principal principal) {
-//        if (principal == null) {
-//            // Fallback for testing if security is not fully enforced
-//            return "patient@test.com";
-//        }
-//        return principal.getName();
-//    }
-//
-//    @PostMapping
-//    public ResponseEntity<AppointmentDto> bookAppointment(@RequestBody AppointmentRequestDto request, Principal principal) {
-//        return ResponseEntity.ok(appointmentService.bookAppointment(request, getEmail(principal)));
-//    }
-//
-//    @GetMapping("/my-appointments")
-//    public ResponseEntity<List<AppointmentDto>> getMyAppointments(Principal principal) {
-//        return ResponseEntity.ok(appointmentService.getMyAppointments(getEmail(principal)));
-//    }
-//
-//    @PutMapping("/{id}/cancel")
-//    public ResponseEntity<AppointmentDto> cancelAppointment(@PathVariable Long id, Principal principal) {
-//        return ResponseEntity.ok(appointmentService.cancelAppointment(id, getEmail(principal)));
-//    }
-//
-//    @PutMapping("/{id}/reschedule")
-//    public ResponseEntity<AppointmentDto> rescheduleAppointment(
-//            @PathVariable Long id,
-//            @RequestBody RescheduleRequestDto request,
-//            Principal principal) {
-//        return ResponseEntity.ok(appointmentService.rescheduleAppointment(id, request, getEmail(principal)));
-//    }
-//>>>>>>> origin/uyenht
-//}

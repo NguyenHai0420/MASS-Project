@@ -7,4 +7,5 @@ import java.util.List;
 public interface DoctorService {
     List<DoctorDto> getDoctors(Long specialtyId, String name);
     DoctorDto getDoctorById(Long id);
+    DoctorDto getMyDoctorProfile(String email);
 }

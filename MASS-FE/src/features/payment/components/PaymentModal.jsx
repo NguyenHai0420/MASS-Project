@@ -126,7 +126,9 @@ const PaymentModal = ({ show, onHide, appointment, onPaymentSuccess }) => {
             </p>
 
             {/* Số tiền */}
-            <div className="appt-payment-amount mb-3">10000 VND</div>
+            <div className="appt-payment-amount mb-3">
+              {paymentData.amount ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(paymentData.amount) : "10000 VND"}
+            </div>
 
             {/* QR Code */}
             {paymentData.qrCode && (

@@ -138,6 +138,7 @@ public class PaymentServiceImpl implements PaymentService{
                     .paymentStatus(
                             payment.getPaymentStatus()
                     )
+                    .amount(payment.getAmount())
                     .build();
 
         } catch (Exception exception) {
@@ -200,9 +201,9 @@ public class PaymentServiceImpl implements PaymentService{
                 PaymentStatus.COMPLETED
         );
 
-        payment.setTransactionId(
-                webhookData.getReference()
-        );
+        if (payment.getTransactionId() == null) {
+            payment.setTransactionId(generateTransactionCode());
+        }
 
         payment.setPaymentDate(
                 LocalDateTime.now()
@@ -264,6 +265,9 @@ public class PaymentServiceImpl implements PaymentService{
             if ("PAID".equals(data.getStatus().name())) {
                 payment.setPaymentStatus(PaymentStatus.COMPLETED);
                 payment.setPaymentDate(java.time.LocalDateTime.now());
+                if (payment.getTransactionId() == null) {
+                    payment.setTransactionId(generateTransactionCode());
+                }
                 
                 Appointment appointment = payment.getAppointment();
                 if (appointment.getType() == AppointmentType.WALK_IN) {
@@ -283,5 +287,15 @@ public class PaymentServiceImpl implements PaymentService{
             // ignore
         }
         return "PENDING";
+    }
+
+    private String generateTransactionCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder();
+        java.util.Random rnd = new java.util.Random();
+        for (int i = 0; i < 6; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 }

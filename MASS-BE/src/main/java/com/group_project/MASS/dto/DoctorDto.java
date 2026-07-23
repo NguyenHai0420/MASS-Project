@@ -14,4 +14,7 @@ public class DoctorDto {
     private String name;
     private String specialtyName;
     private String clinicName;
+    private String experience;
+    private String degree;
+    private String description;
 }

@@ -45,12 +45,24 @@ public class DoctorServiceImpl implements DoctorService {
             .orElse(null);
     }
 
+    @Override
+    public DoctorDto getMyDoctorProfile(String email) {
+        Optional<DoctorProfile> profileOpt = doctorProfileRepository.findByUserEmail(email);
+        return profileOpt
+            .filter(profile -> profile.getUser() != null && Boolean.TRUE.equals(profile.getUser().getActive()))
+            .map(this::mapToDto)
+            .orElse(null);
+    }
+
     private DoctorDto mapToDto(DoctorProfile profile) {
         return DoctorDto.builder()
             .id(profile.getId())
             .name(profile.getUser() != null ? profile.getUser().getFullName() : "Unknown")
             .specialtyName(profile.getSpecialty() != null ? profile.getSpecialty().getName() : "Unknown")
             .clinicName("Phòng khám MASS")
+            .experience(profile.getExperience())
+            .degree(profile.getDegree())
+            .description(profile.getDescription())
             .build();
     }
 }

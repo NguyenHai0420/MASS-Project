@@ -32,7 +32,7 @@ const Home = () => {
             </Col>
             <Col md={6} className="text-center mt-4 mt-md-0">
               {/* Placeholder for an image */}
-              <div className="bg-secondary rounded text-white d-flex align-items-center justify-content-center shadow-sm" style={{height: '300px'}}>
+              <div className="bg-secondary rounded text-white d-flex align-items-center justify-content-center shadow-sm" style={{ height: '300px' }}>
                 <h3>MASS Clinic Banner</h3>
               </div>
             </Col>

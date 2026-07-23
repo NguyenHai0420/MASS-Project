@@ -13,7 +13,6 @@ const AppointmentHeroSection = ({
     <section className="appt-hero">
       <div className="container">
         <div className="appt-hero-content">
-          <span className="appt-eyebrow">Receptionist Module</span>
           <h1 className="fw-bold mb-2">Appointment List</h1>
           <p className="text-white-50 mb-4">
             Danh sách lịch hẹn bệnh nhân – tìm kiếm, lọc trạng thái và theo dõi thanh toán.

@@ -7,6 +7,7 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
     patientName: '',
     patientPhone: '',
     patientEmail: '',
+    patientGender: '',
     specialtyId: '',
     appointmentDate: '',
     doctorProfileId: '',
@@ -18,7 +19,7 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
-  
+
   // State danh sách bác sĩ
   const [doctors, setDoctors] = useState([]);
   const [loadingDoctors, setLoadingDoctors] = useState(false);
@@ -113,6 +114,7 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
     if (!form.patientName.trim()) return setError('Vui lòng nhập tên bệnh nhân.');
     if (!form.patientPhone.trim()) return setError('Vui lòng nhập số điện thoại.');
     if (!form.patientEmail.trim()) return setError('Vui lòng nhập email bệnh nhân.');
+    if (!form.patientGender) return setError('Vui lòng chọn giới tính.');
     if (!form.dateOfBirth) return setError('Vui lòng nhập ngày sinh.');
     if (!form.address.trim()) return setError('Vui lòng nhập địa chỉ.');
     if (!form.specialtyId) return setError('Vui lòng chọn chuyên khoa.');
@@ -127,6 +129,7 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
         patientName: form.patientName.trim(),
         patientPhone: form.patientPhone.trim(),
         patientEmail: form.patientEmail.trim(),
+        patientGender: form.patientGender,
         dateOfBirth: form.dateOfBirth,
         address: form.address.trim(),
         specialtyId: Number(form.specialtyId),
@@ -153,16 +156,16 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
   };
 
   const handleClose = () => {
-    setForm({ 
-        patientName: '', 
-        patientPhone: '', 
-        patientEmail: '', 
-        specialtyId: '', 
-        appointmentDate: '', 
-        doctorProfileId: '', 
-        reason: '',
-        dateOfBirth: '',
-        address: ''
+    setForm({
+      patientName: '',
+      patientPhone: '',
+      patientEmail: '',
+      specialtyId: '',
+      appointmentDate: '',
+      doctorProfileId: '',
+      reason: '',
+      dateOfBirth: '',
+      address: ''
     });
     setAvailableSlots([]);
     setSelectedSlot(null);
@@ -195,7 +198,7 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
               <h6 className="fw-bold mb-0 text-primary">Thông tin Bệnh nhân (Tạo mới / Tìm tự động qua email)</h6>
               <hr className="mt-2 mb-3" />
             </Col>
-            
+
             <Col md={4}>
               <Form.Group>
                 <Form.Label className="appt-modal-label">Họ và tên *</Form.Label>
@@ -208,7 +211,7 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
                 />
               </Form.Group>
             </Col>
-            
+
             <Col md={4}>
               <Form.Group>
                 <Form.Label className="appt-modal-label">Số điện thoại *</Form.Label>
@@ -248,7 +251,23 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
               </Form.Group>
             </Col>
 
-            <Col md={8}>
+            <Col md={3}>
+              <Form.Group>
+                <Form.Label className="appt-modal-label">Giới tính *</Form.Label>
+                <Form.Select
+                  className="appt-modal-control"
+                  value={form.patientGender}
+                  onChange={(e) => handleChange('patientGender', e.target.value)}
+                >
+                  <option value="">Chọn giới tính</option>
+                  <option value="Male">Nam</option>
+                  <option value="Female">Nữ</option>
+                  <option value="Other">Khác</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+
+            <Col md={5}>
               <Form.Group>
                 <Form.Label className="appt-modal-label">Địa chỉ *</Form.Label>
                 <Form.Control
@@ -348,25 +367,26 @@ const WalkInModal = ({ show, onHide, onSuccess }) => {
                     Không còn slot trống trong ngày này. Hệ thống sẽ tự chọn slot gần nhất.
                   </p>
                 ) : (
-                  <div className="d-flex flex-wrap gap-2 mt-1">
+                  <Row className="g-2 mt-1">
                     {availableSlots.map((slot) => (
-                      <div
-                        key={slot.scheduleId}
-                        className={`appt-slot-card ${selectedSlot?.scheduleId === slot.scheduleId ? 'selected' : ''}`}
-                        onClick={() => setSelectedSlot(slot)}
-                      >
-                        {slot.startTime}
-                        <br />
-                        <span style={{ fontSize: 11, color: '#64748b' }}>STT {slot.queueNumber}</span>
-                        {slot.doctorName && (
-                          <>
-                            <br />
-                            <span style={{ fontSize: 11, color: '#64748b' }}>{slot.doctorName}</span>
-                          </>
-                        )}
-                      </div>
+                      <Col xs={6} sm={4} md={3} key={slot.scheduleId}>
+                        <div
+                          className={`appt-slot-card w-100 h-100 ${selectedSlot?.scheduleId === slot.scheduleId ? 'selected' : ''}`}
+                          onClick={() => setSelectedSlot(slot)}
+                        >
+                          {slot.startTime}
+                          <br />
+                          <span style={{ fontSize: 11, color: '#64748b' }}>STT {slot.queueNumber}</span>
+                          {slot.doctorName && (
+                            <>
+                              <br />
+                              <span style={{ fontSize: 11, color: '#64748b' }}>{slot.doctorName}</span>
+                            </>
+                          )}
+                        </div>
+                      </Col>
                     ))}
-                  </div>
+                  </Row>
                 )}
               </Col>
             )}

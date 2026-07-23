@@ -75,7 +75,7 @@ const AppointmentCard = ({ appointment, onViewDetail, onCheckIn, onPayment, onCa
           </button>
         )}
 
-        {(appointmentStatus === 'PENDING_PAYMENT' || appointmentStatus === 'WAITING_CHECK_IN') && (
+        {appointmentStatus === 'PENDING_PAYMENT' && (
           <button className="appt-btn-cancel" onClick={() => onCancel?.(appointment)}>
             Hủy
           </button>

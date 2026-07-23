@@ -30,4 +30,17 @@ public class DoctorController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/profile/me")
+    public ResponseEntity<DoctorDto> getMyDoctorProfile(java.security.Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(401).build();
+        }
+        String email = principal.getName();
+        DoctorDto dto = doctorService.getMyDoctorProfile(email);
+        if (dto != null) {
+            return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
