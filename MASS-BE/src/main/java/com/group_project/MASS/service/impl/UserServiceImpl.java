@@ -1,6 +1,6 @@
 package com.group_project.MASS.service.impl;
 
-import com.group_project.MASS.dto.UpdateProfileRequest;
+import com.group_project.MASS.dto.request.UpdateProfileRequest;
 import com.group_project.MASS.dto.UserProfileDto;
 import com.group_project.MASS.model.User;
 import com.group_project.MASS.repository.UserRepository;

@@ -1,6 +1,6 @@
 package com.group_project.MASS.service.impl;
 
-import com.group_project.MASS.dto.DoctorRequest;
+import com.group_project.MASS.dto.request.DoctorRequest;
 import com.group_project.MASS.dto.DoctorResponse;
 import com.group_project.MASS.model.DoctorProfile;
 import com.group_project.MASS.model.Role;

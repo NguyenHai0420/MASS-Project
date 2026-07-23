@@ -1,7 +1,7 @@
 package com.group_project.MASS.service;
 
 import com.group_project.MASS.dto.UserResponse;
-import com.group_project.MASS.dto.UserUpdateRequest;
+import com.group_project.MASS.dto.request.UserUpdateRequest;
 
 import java.util.List;
 

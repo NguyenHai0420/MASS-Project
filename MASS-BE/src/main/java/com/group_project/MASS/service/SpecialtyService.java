@@ -1,6 +1,6 @@
 package com.group_project.MASS.service;
 
-import com.group_project.MASS.dto.SpecialtyRequest;
+import com.group_project.MASS.dto.request.SpecialtyRequest;
 import com.group_project.MASS.dto.SpecialtyResponse;
 
 import java.util.List;

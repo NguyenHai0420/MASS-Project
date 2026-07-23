@@ -1,7 +1,7 @@
 package com.group_project.MASS.controller;
 
 import com.group_project.MASS.dto.UserResponse;
-import com.group_project.MASS.dto.UserUpdateRequest;
+import com.group_project.MASS.dto.request.UserUpdateRequest;
 import com.group_project.MASS.service.UserAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

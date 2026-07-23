@@ -1,6 +1,6 @@
 package com.group_project.MASS.service;
 
-import com.group_project.MASS.dto.DoctorRequest;
+import com.group_project.MASS.dto.request.DoctorRequest;
 import com.group_project.MASS.dto.DoctorResponse;
 
 import java.util.List;

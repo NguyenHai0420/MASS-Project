@@ -1,6 +1,6 @@
 package com.group_project.MASS.service.impl;
 
-import com.group_project.MASS.dto.MedicalRecordRequest;
+import com.group_project.MASS.dto.request.MedicalRecordRequest;
 import com.group_project.MASS.dto.MedicalRecordResponse;
 import com.group_project.MASS.model.Appointment;
 import com.group_project.MASS.model.AppointmentStatus;

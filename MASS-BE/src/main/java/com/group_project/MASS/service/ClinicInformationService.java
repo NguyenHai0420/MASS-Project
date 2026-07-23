@@ -1,6 +1,6 @@
 package com.group_project.MASS.service;
 
-import com.group_project.MASS.dto.ClinicInformationRequest;
+import com.group_project.MASS.dto.request.ClinicInformationRequest;
 import com.group_project.MASS.dto.ClinicInformationResponse;
 
 import java.util.List;

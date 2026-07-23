@@ -1,8 +1,8 @@
 package com.group_project.MASS.controller;
 
 import com.group_project.MASS.dto.AppointmentDto;
-import com.group_project.MASS.dto.AppointmentRequestDto;
-import com.group_project.MASS.dto.RescheduleRequestDto;
+import com.group_project.MASS.dto.request.AppointmentRequestDto;
+import com.group_project.MASS.dto.request.RescheduleRequestDto;
 import com.group_project.MASS.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

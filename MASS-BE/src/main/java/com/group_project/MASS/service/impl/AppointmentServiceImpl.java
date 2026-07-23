@@ -1,8 +1,8 @@
 package com.group_project.MASS.service.impl;
 
 import com.group_project.MASS.dto.AppointmentDto;
-import com.group_project.MASS.dto.AppointmentRequestDto;
-import com.group_project.MASS.dto.RescheduleRequestDto;
+import com.group_project.MASS.dto.request.AppointmentRequestDto;
+import com.group_project.MASS.dto.request.RescheduleRequestDto;
 import com.group_project.MASS.service.AppointmentService;
 
 import com.group_project.MASS.dto.AppointmentResponse;
@@ -1043,7 +1043,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         boolean validTransition = switch (currentStatus) {
 
-            case PENDING_PAYMENT ->
+            case PENDING, PENDING_PAYMENT ->
                     newStatus == AppointmentStatus.WAITING_CHECK_IN;
 
             case WAITING_CHECK_IN ->

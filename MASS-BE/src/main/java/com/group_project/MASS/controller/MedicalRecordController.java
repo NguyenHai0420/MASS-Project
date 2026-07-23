@@ -1,6 +1,6 @@
 package com.group_project.MASS.controller;
 
-import com.group_project.MASS.dto.MedicalRecordRequest;
+import com.group_project.MASS.dto.request.MedicalRecordRequest;
 import com.group_project.MASS.dto.MedicalRecordResponse;
 import com.group_project.MASS.service.MedicalRecordService;
 import jakarta.validation.Valid;

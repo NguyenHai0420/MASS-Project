@@ -9,8 +9,8 @@ import com.group_project.MASS.dto.response.*;
 import com.group_project.MASS.model.AppointmentStatus;
 import com.group_project.MASS.model.Specialty;
 import com.group_project.MASS.dto.AppointmentDto;
-import com.group_project.MASS.dto.AppointmentRequestDto;
-import com.group_project.MASS.dto.RescheduleRequestDto;
+import com.group_project.MASS.dto.request.AppointmentRequestDto;
+import com.group_project.MASS.dto.request.RescheduleRequestDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

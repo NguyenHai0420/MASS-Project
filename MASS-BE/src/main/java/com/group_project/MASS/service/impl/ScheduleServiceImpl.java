@@ -1,7 +1,7 @@
 package com.group_project.MASS.service.impl;
 
 import com.group_project.MASS.dto.ScheduleDto;
-import com.group_project.MASS.dto.ScheduleRequest;
+import com.group_project.MASS.dto.request.ScheduleRequest;
 import com.group_project.MASS.dto.ScheduleResponse;
 import com.group_project.MASS.model.DoctorProfile;
 import com.group_project.MASS.model.Schedule;

@@ -1,4 +1,4 @@
-package com.group_project.MASS.dto;
+package com.group_project.MASS.dto.request;
 
 import lombok.Data;
 
