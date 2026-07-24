@@ -50,7 +50,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     // Find all appointments for a specific doctor profile and date, ordered
     Page<Appointment> findByDoctorProfileSpecialtyIdAndScheduleDate(Long specialtyId, LocalDate date, Pageable page);
 
-    // Find all appointments for a specific doctor profile, date, and status, ordered
+    // Find all appointments for a specific doctor profile, date, and status
     Page<Appointment> findByDoctorProfileSpecialtyIdAndScheduleDateAndStatus(
             Long specialtyId,
             LocalDate date,

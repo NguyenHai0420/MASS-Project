@@ -30,10 +30,10 @@ const AppNavbar = () => {
               <Nav.Link as={Link} to="/my-appointments">Lịch hẹn của tôi</Nav.Link>
             )}
             {user && user.role === "ROLE_ADMIN" && (
-              <Nav.Link as={Link} to="/admin/dashboard">⚙️ Dashboard</Nav.Link>
+              <Nav.Link as={Link} to="/admin/dashboard">Dashboard</Nav.Link>
             )}
             {user && user.role === "ROLE_DOCTOR" && (
-              <Nav.Link as={Link} to="/doctor/dashboard">🩺 Dashboard</Nav.Link>
+              <Nav.Link as={Link} to="/doctor/dashboard">Dashboard</Nav.Link>
             )}
           </Nav>
           <Nav>
