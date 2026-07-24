@@ -7,17 +7,17 @@ import adminService from "../services/adminService";
 
 export default function ManageClinicPage() {
     const [clinic, setClinic] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const { register, handleSubmit, formState: { errors }, reset } = useForm();
+    const [loading, setLoading] = useState(true);
+    const { register, handleSubmit, formState: { errors, isSubmitting, isDirty }, reset } = useForm();
 
     useEffect(() => {
         fetchData();
     }, []);
 
     const fetchData = async () => {
+        setLoading(true);
         try {
             const data = await adminService.getClinicInfo();
-
             const clinicData = Array.isArray(data) ? data[0] : data;
             if (clinicData) {
                 setClinic(clinicData);
@@ -32,10 +32,12 @@ export default function ManageClinicPage() {
         } catch (error) {
             console.error(error);
             toast.error("Không thể tải thông tin phòng khám!");
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleEditStart = () => {
+    const handleResetForm = () => {
         if (clinic) {
             reset({
                 name: clinic.name || "",
@@ -44,8 +46,8 @@ export default function ManageClinicPage() {
                 email: clinic.email || "",
                 workingHours: clinic.workingHours || ""
             });
+            toast.success("Đã khôi phục thông tin ban đầu!");
         }
-        setIsEditing(true);
     };
 
     const onSubmit = async (data) => {
@@ -58,18 +60,25 @@ export default function ManageClinicPage() {
                 workingHours: data.workingHours || ""
             };
 
+            let result;
             if (clinic?.id) {
-                const updated = await adminService.updateClinicInfo(clinic.id, payload);
-                setClinic(updated);
-                reset(updated);
+                result = await adminService.updateClinicInfo(clinic.id, payload);
                 toast.success("Cập nhật thông tin thành công!");
             } else {
-                const newClinic = await adminService.createClinicInfo(payload);
-                setClinic(newClinic);
-                reset(newClinic);
+                result = await adminService.createClinicInfo(payload);
                 toast.success("Tạo thông tin phòng khám thành công!");
             }
-            setIsEditing(false);
+
+            if (result) {
+                setClinic(result);
+                reset({
+                    name: result.name || "",
+                    address: result.address || "",
+                    phone: result.phone || "",
+                    email: result.email || "",
+                    workingHours: result.workingHours || ""
+                });
+            }
         } catch (error) {
             console.error(error);
             const errorMsg = error.response?.data?.message || "Lưu thất bại!";
@@ -95,8 +104,7 @@ export default function ManageClinicPage() {
                                 <Form.Label className="fw-bold">Tên phòng khám</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    readOnly={!isEditing}
-                                    className={!isEditing ? "bg-light" : ""}
+                                    placeholder="Nhập tên phòng khám"
                                     {...register("name", { required: "Tên phòng khám không được để trống" })}
                                 />
                                 {errors.name && (
@@ -109,8 +117,7 @@ export default function ManageClinicPage() {
                                 <Form.Control
                                     as="textarea"
                                     rows={2}
-                                    readOnly={!isEditing}
-                                    className={!isEditing ? "bg-light" : ""}
+                                    placeholder="Nhập địa chỉ phòng khám"
                                     {...register("address", { required: "Địa chỉ không được để trống" })}
                                 />
                                 {errors.address && (
@@ -122,8 +129,7 @@ export default function ManageClinicPage() {
                                 <Form.Label className="fw-bold">Số điện thoại liên hệ</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    readOnly={!isEditing}
-                                    className={!isEditing ? "bg-light" : ""}
+                                    placeholder="Nhập số điện thoại liên hệ"
                                     {...register("phone")}
                                 />
                             </Form.Group>
@@ -132,8 +138,7 @@ export default function ManageClinicPage() {
                                 <Form.Label className="fw-bold">Email</Form.Label>
                                 <Form.Control
                                     type="email"
-                                    readOnly={!isEditing}
-                                    className={!isEditing ? "bg-light" : ""}
+                                    placeholder="Nhập email phòng khám"
                                     {...register("email")}
                                 />
                             </Form.Group>
@@ -142,30 +147,19 @@ export default function ManageClinicPage() {
                                 <Form.Label className="fw-bold">Giờ làm việc</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    readOnly={!isEditing}
-                                    className={!isEditing ? "bg-light" : ""}
-                                    placeholder="Ví dụ: Thứ 2 - Thứ 7: 8:00 - 17:30"
+                                    placeholder="Ví dụ: Thứ 2 - Thu 7: 8:00 - 17:30"
                                     {...register("workingHours")}
                                 />
                             </Form.Group>
 
                             <div className="d-flex gap-2">
-                                {!isEditing ? (
-                                    <Button variant="primary" type="button" onClick={handleEditStart}>
-                                        Chỉnh sửa thông tin
+                                <Button variant="primary" type="submit" disabled={isSubmitting || loading}>
+                                    {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
+                                </Button>
+                                {isDirty && (
+                                    <Button variant="outline-secondary" type="button" onClick={handleResetForm}>
+                                        Hủy thay đổi
                                     </Button>
-                                ) : (
-                                    <>
-                                        <Button variant="success" type="submit">
-                                            Lưu thay đổi
-                                        </Button>
-                                        <Button variant="secondary" type="button" onClick={() => {
-                                            setIsEditing(false);
-                                            if (clinic) reset(clinic);
-                                        }}>
-                                            Hủy
-                                        </Button>
-                                    </>
                                 )}
                             </div>
                         </Form>

@@ -34,7 +34,7 @@ public class ClinicInformationController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ClinicInformationResponse> updateClinicInformation(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody ClinicInformationRequest request) {
         return ResponseEntity.ok(clinicInformationService.updateClinicInformation(id, request));
     }

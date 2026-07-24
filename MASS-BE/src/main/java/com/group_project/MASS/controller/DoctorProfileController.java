@@ -32,14 +32,14 @@ public class DoctorProfileController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<DoctorResponse> updateDoctor(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody DoctorRequest request) {
         return ResponseEntity.ok(doctorProfileService.updateDoctor(id, request));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> deleteDoctor(@PathVariable Long id) {
+    public ResponseEntity<?> deleteDoctor(@PathVariable("id") Long id) {
         doctorProfileService.deleteDoctor(id);
         return ResponseEntity.ok().build();
     }

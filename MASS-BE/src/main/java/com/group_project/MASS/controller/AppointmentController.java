@@ -57,13 +57,13 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<AppointmentDto> cancelAppointment(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<AppointmentDto> cancelAppointment(@PathVariable("id") Long id, Principal principal) {
         return ResponseEntity.ok(appointmentService.cancelPatientAppointment(id, getEmail(principal)));
     }
 
     @PutMapping("/{id}/reschedule")
     public ResponseEntity<AppointmentDto> rescheduleAppointment(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody RescheduleRequestDto request,
             Principal principal) {
         return ResponseEntity.ok(appointmentService.rescheduleAppointment(id, request, getEmail(principal)));

@@ -36,7 +36,7 @@ public class DoctorScheduleController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSchedule(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             Authentication authentication) {
         String email = authentication.getName();
         scheduleService.deleteSchedule(id, email);

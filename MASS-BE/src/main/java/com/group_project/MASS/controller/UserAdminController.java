@@ -25,13 +25,13 @@ public class UserAdminController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody UserUpdateRequest request) {
         return ResponseEntity.ok(userAdminService.updateUser(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         userAdminService.deleteUser(id);
         return ResponseEntity.ok().build();
     }

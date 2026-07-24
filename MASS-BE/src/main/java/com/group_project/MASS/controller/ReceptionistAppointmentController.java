@@ -49,7 +49,7 @@ public class ReceptionistAppointmentController {
 
     @GetMapping("/{appointmentId}")
     public ResponseEntity<AppointmentDetailResponse> getAppointmentDetail(
-            @PathVariable Long appointmentId
+            @PathVariable("appointmentId") Long appointmentId
     ) {
         return ResponseEntity
                 .ok(appointmentService.getAppointmentDetail(appointmentId));
@@ -97,7 +97,7 @@ public class ReceptionistAppointmentController {
     @PatchMapping("/{appointmentId}/check-in")
     public ResponseEntity<AppointmentDetailResponse>
     checkInAppointment(
-            @PathVariable Long appointmentId
+            @PathVariable("appointmentId") Long appointmentId
     ) {
         return ResponseEntity.ok(
                 appointmentService.checkInAppointment(
@@ -108,7 +108,7 @@ public class ReceptionistAppointmentController {
 
     @PutMapping("/{appointmentId}")
     public ResponseEntity<AppointmentDetailResponse> updateAppointment(
-            @PathVariable
+            @PathVariable("appointmentId")
             Long appointmentId,
             @Valid
             @RequestBody
@@ -120,7 +120,7 @@ public class ReceptionistAppointmentController {
 
     @PatchMapping("/{appointmentId}/status")
     public ResponseEntity<ApiMessageResponse> updateAppointmentStatus(
-            @PathVariable
+            @PathVariable("appointmentId")
             Long appointmentId,
             @Valid
             @RequestBody
@@ -132,7 +132,7 @@ public class ReceptionistAppointmentController {
 
     @PatchMapping("/{appointmentId}/cancel")
     public ResponseEntity<ApiMessageResponse> cancelAppointment(
-            @PathVariable
+            @PathVariable("appointmentId")
             Long appointmentId,
             @Valid
             @RequestBody

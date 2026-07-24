@@ -16,7 +16,7 @@ public class PaymentController {
     @PostMapping("/appointments/{appointmentId}/payment-link")
     public ResponseEntity<PaymentLinkResponse>
     createPaymentLink(
-            @PathVariable Long appointmentId
+            @PathVariable("appointmentId") Long appointmentId
     ) {
         return ResponseEntity.ok(
                 paymentService.createPaymentLink(
@@ -26,7 +26,7 @@ public class PaymentController {
     }
 
     @GetMapping("/appointments/{appointmentId}/status")
-    public ResponseEntity<String> checkStatus(@PathVariable Long appointmentId) {
+    public ResponseEntity<String> checkStatus(@PathVariable("appointmentId") Long appointmentId) {
         return ResponseEntity.ok(paymentService.checkPaymentStatus(appointmentId));
     }
 

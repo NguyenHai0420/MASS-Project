@@ -18,7 +18,7 @@ public class MedicalRecordController {
     private MedicalRecordService medicalRecordService;
 
     @GetMapping("/appointment/{appointmentId}")
-    public ResponseEntity<MedicalRecordResponse> getByAppointmentId(@PathVariable Long appointmentId) {
+    public ResponseEntity<MedicalRecordResponse> getByAppointmentId(@PathVariable("appointmentId") Long appointmentId) {
         return ResponseEntity.ok(medicalRecordService.getByAppointmentId(appointmentId));
     }
 
@@ -30,7 +30,7 @@ public class MedicalRecordController {
 
     @PutMapping("/{id}")
     public ResponseEntity<MedicalRecordResponse> updateMedicalRecord(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody MedicalRecordRequest request) {
         return ResponseEntity.ok(medicalRecordService.updateMedicalRecord(id, request));
     }

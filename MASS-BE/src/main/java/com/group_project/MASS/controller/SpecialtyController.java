@@ -32,14 +32,14 @@ public class SpecialtyController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<SpecialtyResponse> updateSpecialty(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody SpecialtyRequest request) {
         return ResponseEntity.ok(specialtyService.updateSpecialty(id, request));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> deleteSpecialty(@PathVariable Long id) {
+    public ResponseEntity<?> deleteSpecialty(@PathVariable("id") Long id) {
         specialtyService.deleteSpecialty(id);
         return ResponseEntity.ok().build();
     }
