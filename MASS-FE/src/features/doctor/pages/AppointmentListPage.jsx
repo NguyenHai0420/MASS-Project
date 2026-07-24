@@ -5,11 +5,6 @@ import DashboardLayout from "../../../shared/components/DashboardLayout";
 import doctorService from "../services/doctorService";
 import MedicalRecordModal from "../components/MedicalRecordModal";
 
-// ========================
-// UC-M23 — Appointment List
-// Doctor xem toàn bộ danh sách cuộc hẹn của mình
-// ========================
-
 function getStatusBadge(status) {
     switch (status) {
         case "CONFIRMED": return "primary";
@@ -22,8 +17,7 @@ function getStatusBadge(status) {
 
 export default function AppointmentListPage() {
     const [appointments, setAppointments] = useState([]);
-    
-    // Modal states
+
     const [showModal, setShowModal] = useState(false);
     const [selectedAppt, setSelectedAppt] = useState(null);
 
@@ -46,7 +40,7 @@ export default function AppointmentListPage() {
     };
 
     const handleModalSuccess = () => {
-        fetchData(); // Reload list
+        fetchData();
     };
 
     return (
@@ -81,7 +75,7 @@ export default function AppointmentListPage() {
                                     </Badge>
                                 </td>
                                 <td>
-                                    {/* Chỉ cho nhập kết quả nếu cuộc hẹn đã WAITING_FOR_TURN (đã thanh toán) */}
+                                    {}
                                     {a.status === "WAITING_FOR_TURN" && (
                                         <Button
                                             variant="success"
@@ -106,9 +100,9 @@ export default function AppointmentListPage() {
                     </tbody>
                 </Table>
 
-                {/* Pop-up xem / sửa kết quả khám bệnh */}
-                <MedicalRecordModal 
-                    show={showModal} 
+                {}
+                <MedicalRecordModal
+                    show={showModal}
                     onHide={() => setShowModal(false)}
                     appointment={selectedAppt}
                     onSuccess={handleModalSuccess}

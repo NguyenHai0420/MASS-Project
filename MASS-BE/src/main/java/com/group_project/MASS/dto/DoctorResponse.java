@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DoctorResponse {
-    private Long id;               // DoctorProfile id
+    private Long id;
     private Long userId;
     private String fullName;
     private String email;
@@ -18,7 +18,6 @@ public class DoctorResponse {
     private String gender;
     private String avatarUrl;
 
-    // DoctorProfile fields
     private Long specialtyId;
     private String specialtyName;
     private String degree;

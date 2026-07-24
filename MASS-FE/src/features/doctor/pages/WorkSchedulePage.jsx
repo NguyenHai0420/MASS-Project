@@ -4,11 +4,6 @@ import toast, { Toaster } from "react-hot-toast";
 import DashboardLayout from "../../../shared/components/DashboardLayout";
 import doctorService from "../services/doctorService";
 
-// ========================
-// UC-M08 — View Work Schedule
-// Doctor xem lịch làm việc của mình
-// ========================
-
 export default function WorkSchedulePage() {
     const [schedules, setSchedules] = useState([]);
 

@@ -4,13 +4,6 @@ import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../shared/components/DashboardLayout";
 import doctorService from "../services/doctorService";
 
-// ========================
-// UC-M23 — Appointment Dashboard
-// Trang chủ của Doctor
-// Hiển thị các cuộc hẹn hôm nay
-// ========================
-
-// Hàm trả về màu badge theo trạng thái
 function getStatusBadge(status) {
     switch (status) {
         case "CONFIRMED": return "primary";
@@ -32,9 +25,9 @@ export default function DoctorDashboardPage() {
     const fetchData = async () => {
         try {
             const data = await doctorService.getMyAppointments();
-            // Lọc các cuộc hẹn trong ngày hôm nay (YYYY-MM-DD) và chưa COMPLETED
+
             const todayStr = new Date().toLocaleDateString('en-CA');
-            const todayAppointments = data.filter(a => 
+            const todayAppointments = data.filter(a =>
                 a.scheduleDate === todayStr && a.status !== "COMPLETED"
             );
             setAppointments(todayAppointments);
@@ -43,7 +36,6 @@ export default function DoctorDashboardPage() {
         }
     };
 
-    // Thống kê nhanh
     const total = appointments.length;
     const pending = appointments.filter((a) => a.status === "PENDING" || a.status === "CONFIRMED").length;
     const completed = appointments.filter((a) => a.status === "COMPLETED").length;
@@ -53,7 +45,7 @@ export default function DoctorDashboardPage() {
             <Container fluid>
                 <h4 className="mb-4">📋 Dashboard Bác sĩ — Hôm nay</h4>
 
-                {/* Thống kê nhanh */}
+                {}
                 <Row className="g-3 mb-4">
                     <Col md={4}>
                         <Card className="text-center border-primary">
@@ -81,7 +73,7 @@ export default function DoctorDashboardPage() {
                     </Col>
                 </Row>
 
-                {/* Danh sách hẹn hôm nay */}
+                {}
                 <h5>Danh sách hẹn hôm nay</h5>
                 <Table striped bordered hover responsive>
                     <thead>

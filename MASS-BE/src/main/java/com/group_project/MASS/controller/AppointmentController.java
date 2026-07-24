@@ -30,8 +30,8 @@ public class AppointmentController {
 
     private String getEmail(Principal principal) {
         if (principal == null) {
-            // Fallback for testing if security is not fully enforced
-            return "patient@test.com"; 
+
+            return "patient@test.com";
         }
         return principal.getName();
     }

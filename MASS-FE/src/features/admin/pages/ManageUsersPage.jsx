@@ -5,11 +5,11 @@ import toast, { Toaster } from "react-hot-toast";
 import DashboardLayout from "../../../shared/components/DashboardLayout";
 import adminService from "../services/adminService";
 
-// Hàm trả về màu badge theo role
 function getRoleBadge(role) {
     if (role === "ADMIN" || role === "ROLE_ADMIN") return "danger";
     if (role === "DOCTOR" || role === "ROLE_DOCTOR") return "primary";
-    return "success"; // PATIENT
+    if (role === "RECEPTIONIST" || role === "ROLE_RECEPTIONIST") return "warning";
+    return "success";
 }
 
 export default function ManageUsersPage() {
@@ -160,7 +160,7 @@ export default function ManageUsersPage() {
                     </tbody>
                 </Table>
 
-                {/* Modal Sửa */}
+                {}
                 <Modal show={showModal} onHide={handleClose} backdrop="static">
                     <Modal.Header closeButton>
                         <Modal.Title>Sửa thông tin người dùng</Modal.Title>
@@ -189,9 +189,9 @@ export default function ManageUsersPage() {
                             <Form.Group className="mb-3">
                                 <Form.Label>Role</Form.Label>
                                 <Form.Select {...register("role")}>
-                                    <option value="ROLE_PATIENT">PATIENT</option>
-                                    <option value="ROLE_DOCTOR">DOCTOR</option>
-                                    <option value="ROLE_ADMIN">ADMIN</option>
+                                    <option value="ROLE_PATIENT">PATIENT (Bệnh nhân)</option>
+                                    <option value="ROLE_DOCTOR">DOCTOR (Bác sĩ)</option>
+                                    <option value="ROLE_RECEPTIONIST">RECEPTIONIST (Lễ tân)</option>
                                 </Form.Select>
                             </Form.Group>
 
